@@ -1,0 +1,73 @@
+{
+    "env": {
+        "es6": true,
+        "node": true
+    },
+    "extends": ["airbnb-base", "plugin:prettier/recommended", "prettier"],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "rules": {
+        "default-case": "off",
+        "import/no-duplicates": "off",
+        "import/prefer-default-export": "off",
+        "import-helpers/order-imports": [
+            "warn",
+            {
+                "newlinesBetween": "always",
+                "alphabetize": {
+                    "order": "asc"
+                }
+            }
+        ],
+        "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
+        "no-param-reassign": "off",
+        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+        "no-unused-expressions": ["off", { "allowShortCircuit": true }],
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^_|next" }],
+        "one-var": ["error", { "uninitialized": "always" }],
+        "prefer-destructuring": "warn",
+        "prettier/prettier": [
+            "error",
+            {
+                "arrowParens": "avoid",
+                "printWidth": 100,
+                "singleQuote": true,
+                "tabWidth": 4,
+                "trailingComma": "all"
+            }
+        ]
+    },
+    "overrides": [
+        {
+            "files": ["**/*.ts"],
+            "extends": ["plugin:@typescript-eslint/recommended"],
+            "parser": "@typescript-eslint/parser",
+            "parserOptions": {
+                "ecmaVersion": "latest",
+                "sourceType": "module"
+            },
+            "plugins": ["@typescript-eslint", "import-helpers"],
+            "rules": {
+                "@typescript-eslint/no-explicit-any": "off",
+                "@typescript-eslint/no-unused-vars": "off",
+                "import/extensions": [
+                    "error",
+                    "ignorePackages",
+                    {
+                        "ts": "never"
+                    }
+                ]
+            }
+        }
+    ],
+    "settings": {
+        "import/resolver": {
+            "typescript": {}
+        },
+        "node": {
+            "extensions": [".js", ".ts"]
+        }
+    }
+}

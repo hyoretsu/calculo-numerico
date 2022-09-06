@@ -1,0 +1,31 @@
+{
+    "version": "0.0.0",
+    "private": true,
+    "workspaces": [
+        "numerical-methods"
+    ],
+    "scripts": {
+        "prepare": "husky install"
+    },
+    "lint-staged": {
+        "**/*.ts": [
+            "eslint --fix",
+            "yarn test --bail --findRelatedTests --passWithNoTests"
+        ]
+    },
+    "devDependencies": {
+        "@types/node": "^18.7.15",
+        "@typescript-eslint/eslint-plugin": "^5.0.0",
+        "@typescript-eslint/parser": ">=5.31.0",
+        "esbuild": "^0.15.7",
+        "eslint": "^8.0.1",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-import-resolver-typescript": "^3.5.0",
+        "eslint-plugin-import": "^2.25.2",
+        "eslint-plugin-import-helpers": "^1.2.1",
+        "eslint-plugin-prettier": "^4.2.1",
+        "prettier": "^2.7.1",
+        "typescript": "*"
+    }
+}

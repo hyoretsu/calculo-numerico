@@ -1,0 +1,31 @@
+{
+    "name": "numerical-methods",
+    "description": "A library that I made while studying Computer Science at UFPB. Documentation's available through TypeScript.",
+    "version": "0.0.0",
+    "keywords": [
+        "academic",
+        "calculus",
+        "numerical analysis",
+        "numerical methods"
+    ],
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "bugs": {
+        "url": "https://github.com/hyoretsu/calculo-numerico/issues",
+        "email": "hyoretsu@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hyoretsu/calculo-numerico.git"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Aran Leite",
+        "email": "hyoretsu@gmail.com",
+        "url": "https://www.linkedin.com/in/aranleite"
+    },
+    "scripts": {
+        "build": "node esbuild.js",
+        "prepublish": "pnpm build && tsc --emitDeclarationOnly"
+    }
+}
