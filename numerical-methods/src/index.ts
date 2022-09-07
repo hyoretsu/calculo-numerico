@@ -32,7 +32,7 @@ export const bisection = ({ func, interval: [a, b], precision }: Bisection) => {
     }
 
     if (iterations < minIterations) {
-        throw new Error('Something went wrong, less iterations than the minimum were');
+        throw new Error('Something went wrong, less iterations than the minimum were done.');
     }
 
     return { iterations, interval: [a, b] };
