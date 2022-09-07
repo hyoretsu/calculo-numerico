@@ -33,5 +33,9 @@ export const bisection = ({ func, interval, precision }: Bisection) => {
         iterations += 1;
     }
 
+    if (iterations < minIterations) {
+        throw new Error('Something went wrong, less iterations than the minimum were');
+    }
+
     return { iterations, interval };
 };
