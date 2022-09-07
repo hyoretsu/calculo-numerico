@@ -9,8 +9,7 @@
     },
     "lint-staged": {
         "**/*.ts": [
-            "eslint --fix",
-            "yarn test --bail --findRelatedTests --passWithNoTests"
+            "eslint --fix"
         ]
     },
     "devDependencies": {
