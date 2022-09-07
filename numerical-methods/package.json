@@ -1,7 +1,7 @@
 {
     "name": "numerical-methods",
     "description": "A library that I made while studying Computer Science at UFPB. Documentation's available through TypeScript.",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "keywords": [
         "academic",
         "calculus",
