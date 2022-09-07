@@ -4,29 +4,28 @@ interface Bisection {
     precision: number;
 }
 
-export const bisection = ({ func, interval, precision }: Bisection) => {
+export const bisection = ({ func, interval: [a, b], precision }: Bisection) => {
     let condition1 = false,
         condition2 = false;
     let iterations = 0;
 
-    const minIterations =
-        (Math.log10(interval[1] - interval[0]) - Math.log10(precision)) / Math.log10(2);
+    const minIterations = (Math.log10(b - a) - Math.log10(precision)) / Math.log10(2);
 
     while (!condition1 && !condition2) {
-        const results = [func(interval[0]), func(interval[1])];
+        const results = [func(a), func(b)];
 
-        condition1 = Math.abs(interval[1] - interval[0]) < precision;
+        condition1 = Math.abs(b - a) < precision;
         condition2 = Math.abs(results[1]) < precision;
         if (condition1 && condition2) break;
 
-        const midPoint = (interval[0] + interval[1]) / 2;
+        const midPoint = (a + b) / 2;
         const midResult = func(midPoint);
         switch (Math.sign(midResult)) {
             case Math.sign(results[0]):
-                interval[0] = midPoint;
+                a = midPoint;
                 break;
             case Math.sign(results[1]):
-                interval[1] = midPoint;
+                b = midPoint;
                 break;
         }
 
@@ -37,5 +36,5 @@ export const bisection = ({ func, interval, precision }: Bisection) => {
         throw new Error('Something went wrong, less iterations than the minimum were');
     }
 
-    return { iterations, interval };
+    return { iterations, interval: [a, b] };
 };
