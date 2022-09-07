@@ -9,12 +9,10 @@ export const bisection = ({ func, interval, precision }: Bisection) => {
         condition2 = false;
     let iterations = 0;
 
-    const maxIterations =
+    const minIterations =
         (Math.log10(interval[1] - interval[0]) - Math.log10(precision)) / Math.log10(2);
 
     while (!condition1 && !condition2) {
-        if (iterations > maxIterations) break;
-
         const results = [func(interval[0]), func(interval[1])];
 
         condition1 = Math.abs(interval[1] - interval[0]) < precision;

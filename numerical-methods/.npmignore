@@ -1,4 +1,4 @@
 .eslintrc.json
 esbuild.js
-src
+src/
 tsconfig.json
