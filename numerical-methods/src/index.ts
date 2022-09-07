@@ -5,18 +5,17 @@ interface Bisection {
 }
 
 export const bisection = ({ func, interval: [a, b], precision }: Bisection) => {
-    let condition1 = false,
-        condition2 = false;
+    let condition1, condition2;
     let iterations = 0;
 
     const minIterations = (Math.log10(b - a) - Math.log10(precision)) / Math.log10(2);
 
-    while (!condition1 && !condition2) {
+    while (true) {
         const results = [func(a), func(b)];
 
         condition1 = Math.abs(b - a) < precision;
         condition2 = Math.abs(results[1]) < precision;
-        if (condition1 && condition2) break;
+        if (condition1 || condition2) break;
 
         const midPoint = (a + b) / 2;
         const midResult = func(midPoint);
