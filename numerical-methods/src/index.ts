@@ -1,10 +1,12 @@
-interface Bisection {
-    func: (x: number) => number;
-    interval: [number, number];
-    precision: number;
-}
+type Interval = [number, number];
 
-export const bisection = ({ func, interval: [a, b], precision }: Bisection) => {
+type Bisection = (
+    func: (x: number) => number,
+    interval: Interval,
+    precision: number,
+) => { iterations: number; interval: [number, number] };
+
+export const bisection: Bisection = (func, [a, b], precision) => {
     let condition1, condition2;
     let iterations = 0;
 
@@ -38,13 +40,13 @@ export const bisection = ({ func, interval: [a, b], precision }: Bisection) => {
     return { iterations, interval: [a, b] };
 };
 
-interface FalsePosition {
-    func: (x: number) => number;
-    interval: [number, number];
-    precision: number;
-}
+type FalsePosition = (
+    func: (x: number) => number,
+    interval: Interval,
+    precision: number,
+) => { iterations: number; interval: [number, number] };
 
-export const falsePosition = ({ func, interval: [a, b], precision }: FalsePosition) => {
+export const falsePosition: FalsePosition = (func, [a, b], precision) => {
     let condition1, condition2;
     let iterations = 0;
 
