@@ -50,7 +50,9 @@ export const bisection: Bisection = (
     }
 
     if (iterations < minIterations) {
-        throw new Error('Something went wrong, less iterations than the minimum were done.');
+        throw new Error(
+            `Something went wrong, less iterations than the minimum (${minIterations}) were done.`,
+        );
     }
 
     return { iterations, interval: [a, b] };
