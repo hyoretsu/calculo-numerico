@@ -18,7 +18,7 @@ export const bisection: Bisection = (
     let condition1, condition2;
     let iterations = 0;
 
-    const minIterations = (Math.log10(b - a) - Math.log10(precision)) / Math.log10(2);
+    const minIterations = Math.ceil(Math.log10(b - a) - Math.log10(precision)) / Math.log10(2);
     if (options.maxIterations < minIterations) {
         throw new Error(
             `The given maximum iterations is less than the minimum iterations (${minIterations}) for the given parameters.`,
