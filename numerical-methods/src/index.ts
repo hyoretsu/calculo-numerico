@@ -4,13 +4,26 @@ type Bisection = (
     func: (x: number) => number,
     interval: Interval,
     precision: number,
+    options?: {
+        maxIterations: number;
+    },
 ) => { iterations: number; interval: [number, number] };
 
-export const bisection: Bisection = (func, [a, b], precision) => {
+export const bisection: Bisection = (
+    func,
+    [a, b],
+    precision,
+    options = { maxIterations: Infinity },
+) => {
     let condition1, condition2;
     let iterations = 0;
 
     const minIterations = (Math.log10(b - a) - Math.log10(precision)) / Math.log10(2);
+    if (options.maxIterations < minIterations) {
+        throw new Error(
+            'The given maximum iterations is less than the minimum iterations for the given parameters.',
+        );
+    }
 
     while (true) {
         const results = [func(a), func(b)];
@@ -18,6 +31,11 @@ export const bisection: Bisection = (func, [a, b], precision) => {
         condition1 = Math.abs(b - a) < precision;
         condition2 = Math.abs(results[1]) < precision;
         if (condition1 || condition2) break;
+
+        iterations += 1;
+        if (iterations >= options.maxIterations) {
+            throw new Error('Maximum iterations exceeded.');
+        }
 
         const midPoint = (a + b) / 2;
         const midResult = func(midPoint);
@@ -29,8 +47,6 @@ export const bisection: Bisection = (func, [a, b], precision) => {
                 b = midPoint;
                 break;
         }
-
-        iterations += 1;
     }
 
     if (iterations < minIterations) {
@@ -44,9 +60,17 @@ type FalsePosition = (
     func: (x: number) => number,
     interval: Interval,
     precision: number,
+    options?: {
+        maxIterations: number;
+    },
 ) => { iterations: number; interval: [number, number] };
 
-export const falsePosition: FalsePosition = (func, [a, b], precision) => {
+export const falsePosition: FalsePosition = (
+    func,
+    [a, b],
+    precision,
+    options = { maxIterations: Infinity },
+) => {
     let condition1, condition2;
     let iterations = 0;
 
@@ -56,6 +80,11 @@ export const falsePosition: FalsePosition = (func, [a, b], precision) => {
         condition1 = Math.abs(b - a) < precision;
         condition2 = Math.abs(results[0]) < precision;
         if (condition1 || condition2) break;
+
+        iterations += 1;
+        if (iterations >= options.maxIterations) {
+            throw new Error('Maximum iterations exceeded.');
+        }
 
         const newPoint = (a * func(b) - b * func(a)) / (func(b) - func(a));
         const newResult = func(newPoint);
@@ -67,8 +96,6 @@ export const falsePosition: FalsePosition = (func, [a, b], precision) => {
                 b = newPoint;
                 break;
         }
-
-        iterations += 1;
     }
 
     return { iterations, interval: [a, b] };
