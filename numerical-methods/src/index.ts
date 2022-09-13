@@ -7,7 +7,7 @@ type Bisection = (
     options?: {
         maxIterations: number;
     },
-) => { iterations: number; interval: [number, number] };
+) => { iterations: number; interval: [number, number]; forced: boolean };
 
 export const bisection: Bisection = (
     func,
@@ -16,7 +16,8 @@ export const bisection: Bisection = (
     options = { maxIterations: Infinity },
 ) => {
     let condition1, condition2;
-    let iterations = 0;
+    let iterations = 0,
+        forced = false;
 
     const minIterations = Math.ceil((Math.log10(b - a) - Math.log10(precision)) / Math.log10(2));
     if (options.maxIterations < minIterations) {
@@ -34,7 +35,8 @@ export const bisection: Bisection = (
 
         iterations += 1;
         if (iterations >= options.maxIterations) {
-            throw new Error('Maximum iterations exceeded.');
+            forced = true;
+            break;
         }
 
         const midPoint = (a + b) / 2;
@@ -55,7 +57,7 @@ export const bisection: Bisection = (
         );
     }
 
-    return { iterations, interval: [a, b] };
+    return { iterations, interval: [a, b], forced };
 };
 
 type FalsePosition = (
@@ -65,7 +67,7 @@ type FalsePosition = (
     options?: {
         maxIterations: number;
     },
-) => { iterations: number; interval: [number, number] };
+) => { iterations: number; interval: [number, number]; forced: boolean };
 
 export const falsePosition: FalsePosition = (
     func,
@@ -74,7 +76,8 @@ export const falsePosition: FalsePosition = (
     options = { maxIterations: Infinity },
 ) => {
     let condition1, condition2;
-    let iterations = 0;
+    let iterations = 0,
+        forced = false;
 
     while (true) {
         const results = [func(a), func(b)];
@@ -85,7 +88,8 @@ export const falsePosition: FalsePosition = (
 
         iterations += 1;
         if (iterations >= options.maxIterations) {
-            throw new Error('Maximum iterations exceeded.');
+            forced = true;
+            break;
         }
 
         const newPoint = (a * func(b) - b * func(a)) / (func(b) - func(a));
@@ -100,5 +104,5 @@ export const falsePosition: FalsePosition = (
         }
     }
 
-    return { iterations, interval: [a, b] };
+    return { iterations, interval: [a, b], forced };
 };
