@@ -32,6 +32,12 @@ importers:
       prettier: 2.7.1
       typescript: 4.8.2
 
+  classes:
+    specifiers:
+      numerical-methods: workspace:*
+    dependencies:
+      numerical-methods: link:../numerical-methods
+
   numerical-methods:
     specifiers: {}
 

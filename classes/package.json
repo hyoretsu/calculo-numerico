@@ -1,0 +1,10 @@
+{
+    "name": "classes",
+    "private": true,
+    "scripts": {
+        "build": "node esbuild.js"
+    },
+    "dependencies": {
+        "numerical-methods": "workspace:*"
+    }
+}
