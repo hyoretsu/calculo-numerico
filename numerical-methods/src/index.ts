@@ -2,21 +2,21 @@ import { derivative, evaluate } from 'mathjs';
 
 type Interval = [number, number];
 
-type Bisection = (
-    func: (x: number) => number,
-    interval: Interval,
-    precision: number,
+type SimpleZerosFunction = (info: {
+    func: (x: number) => number;
+    interval: Interval;
+    precision: number;
     options?: {
         maxIterations: number;
-    },
-) => { iterations: number; interval: [number, number] };
+    };
+}) => { iterations: number; interval: Interval };
 
-export const bisection: Bisection = (
+export const bisection: SimpleZerosFunction = ({
     func,
-    [a, b],
+    interval: [a, b],
     precision,
     options = { maxIterations: Infinity },
-) => {
+}) => {
     let condition1, condition2;
     let iterations = 0;
 
@@ -58,21 +58,12 @@ export const bisection: Bisection = (
     return { iterations, interval: [a, b] };
 };
 
-type FalsePosition = (
-    func: (x: number) => number,
-    interval: Interval,
-    precision: number,
-    options?: {
-        maxIterations: number;
-    },
-) => { iterations: number; interval: [number, number] };
-
-export const falsePosition: FalsePosition = (
+export const falsePosition: SimpleZerosFunction = ({
     func,
-    [a, b],
+    interval: [a, b],
     precision,
     options = { maxIterations: Infinity },
-) => {
+}) => {
     let condition1, condition2;
     let iterations = 0;
 

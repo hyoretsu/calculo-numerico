@@ -10,15 +10,15 @@ console.log(
 
 interval = [0, 1];
 console.log('Primeira raíz');
-console.log('Bisseção', bisection(func, interval, precision));
-console.log('Falsa posição', falsePosition(func, interval, precision));
+console.log('Bisseção', bisection({ func, interval, precision }));
+console.log('Falsa posição', falsePosition({ func, interval, precision }));
 
 console.log();
 
 interval = [2.5, 3];
 console.log('Segunda raíz');
-console.log('Bisseção', bisection(func, interval, precision));
-console.log('Falsa posição', falsePosition(func, interval, precision));
+console.log('Bisseção', bisection({ func, interval, precision }));
+console.log('Falsa posição', falsePosition({ func, interval, precision }));
 
 console.log();
 console.log(
@@ -37,8 +37,11 @@ func = t => 70 * Math.exp(-1.5 * t) + 2.5 * Math.exp(-0.075 * t) - 9;
 interval = [1, 2];
 precision = 5e-2;
 
-console.log('Bisseção', bisection(func, interval, precision, { maxIterations: 5 }));
-console.log('Falsa posição', bisection(func, interval, precision, { maxIterations: 5 }));
+console.log('Bisseção', bisection({ func, interval, precision, options: { maxIterations: 5 } }));
+console.log(
+    'Falsa posição',
+    bisection({ func, interval, precision, options: { maxIterations: 5 } }),
+);
 
 console.log();
 console.log(
