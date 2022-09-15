@@ -1,7 +1,7 @@
 {
     "name": "numerical-methods",
     "description": "A library that I made while studying Computer Science at UFPB. Documentation's available through TypeScript.",
-    "version": "0.2.9",
+    "version": "0.3.0",
     "keywords": [
         "academic",
         "calculus",
@@ -27,5 +27,8 @@
     "scripts": {
         "build": "node esbuild.js",
         "prepublish": "pnpm build && tsc --emitDeclarationOnly"
+    },
+    "dependencies": {
+        "mathjs": "^11.2.1"
     }
 }

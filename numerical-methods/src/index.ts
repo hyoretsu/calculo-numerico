@@ -1,3 +1,5 @@
+import { derivative, evaluate } from 'mathjs';
+
 type Interval = [number, number];
 
 type Bisection = (
@@ -105,4 +107,66 @@ export const falsePosition: FalsePosition = (
     }
 
     return { iterations, interval: [a, b], forced };
+};
+
+type NewtonRaphson = (params: {
+    func: string;
+    initialX: number;
+    precision: number;
+    options?: {
+        maxIterations: number;
+    };
+}) => [
+    results: {
+        iterations: number;
+        x: number;
+    },
+    details: Array<{
+        iteration: number;
+        prevX: number;
+        x: number;
+        y: number;
+        diffY: number;
+        condition1: number;
+        condition2: number;
+    }>,
+];
+
+export const newtonRaphson: NewtonRaphson = ({
+    func,
+    initialX: x,
+    precision,
+    options: { maxIterations } = { maxIterations: Infinity },
+}) => {
+    const details = [];
+    let iterations = -1;
+    let prevX;
+
+    while (true) {
+        const y = evaluate(func, { x });
+        const diffY = derivative(func, 'x').evaluate({ x });
+
+        prevX = x;
+        x -= evaluate(func, { x }) / diffY;
+
+        iterations += 1;
+
+        const condition1 = Math.abs(x - prevX);
+        const condition2 = Math.abs(evaluate(func, { x }));
+
+        details.push({
+            iteration: iterations,
+            prevX,
+            x,
+            y,
+            diffY,
+            condition1,
+            condition2,
+        });
+
+        if ((condition1 < precision && condition2 < precision) || iterations >= maxIterations)
+            break;
+    }
+
+    return [{ iterations, x }, details];
 };
