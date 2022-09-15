@@ -9,7 +9,7 @@ type Bisection = (
     options?: {
         maxIterations: number;
     },
-) => { iterations: number; interval: [number, number]; forced: boolean };
+) => { iterations: number; interval: [number, number] };
 
 export const bisection: Bisection = (
     func,
@@ -18,8 +18,7 @@ export const bisection: Bisection = (
     options = { maxIterations: Infinity },
 ) => {
     let condition1, condition2;
-    let iterations = 0,
-        forced = false;
+    let iterations = 0;
 
     const minIterations = Math.ceil((Math.log10(b - a) - Math.log10(precision)) / Math.log10(2));
     if (options.maxIterations < minIterations) {
@@ -36,10 +35,7 @@ export const bisection: Bisection = (
         if (condition1 || condition2) break;
 
         iterations += 1;
-        if (iterations >= options.maxIterations) {
-            forced = true;
-            break;
-        }
+        if (iterations >= options.maxIterations) break;
 
         const midPoint = (a + b) / 2;
         const midResult = func(midPoint);
@@ -59,7 +55,7 @@ export const bisection: Bisection = (
         );
     }
 
-    return { iterations, interval: [a, b], forced };
+    return { iterations, interval: [a, b] };
 };
 
 type FalsePosition = (
@@ -69,7 +65,7 @@ type FalsePosition = (
     options?: {
         maxIterations: number;
     },
-) => { iterations: number; interval: [number, number]; forced: boolean };
+) => { iterations: number; interval: [number, number] };
 
 export const falsePosition: FalsePosition = (
     func,
@@ -78,8 +74,7 @@ export const falsePosition: FalsePosition = (
     options = { maxIterations: Infinity },
 ) => {
     let condition1, condition2;
-    let iterations = 0,
-        forced = false;
+    let iterations = 0;
 
     while (true) {
         const results = [func(a), func(b)];
@@ -90,7 +85,6 @@ export const falsePosition: FalsePosition = (
 
         iterations += 1;
         if (iterations >= options.maxIterations) {
-            forced = true;
             break;
         }
 
@@ -106,7 +100,7 @@ export const falsePosition: FalsePosition = (
         }
     }
 
-    return { iterations, interval: [a, b], forced };
+    return { iterations, interval: [a, b] };
 };
 
 type NewtonRaphson = (params: {
