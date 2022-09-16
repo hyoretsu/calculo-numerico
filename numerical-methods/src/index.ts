@@ -1,15 +1,13 @@
 import { derivative, evaluate } from 'mathjs';
 
-type Interval = [number, number];
-
 type SimpleZerosFunction = (info: {
     func: (x: number) => number;
-    interval: Interval;
+    interval: [number, number];
     precision: number;
     options?: {
         maxIterations: number;
     };
-}) => { iterations: number; interval: Interval };
+}) => { iterations: number; interval: [string, string] };
 
 export const bisection: SimpleZerosFunction = ({
     func,
@@ -55,7 +53,7 @@ export const bisection: SimpleZerosFunction = ({
         );
     }
 
-    return { iterations, interval: [a, b] };
+    return { iterations, interval: [a.toPrecision(21), b.toPrecision(21)] };
 };
 
 export const falsePosition: SimpleZerosFunction = ({
@@ -91,7 +89,7 @@ export const falsePosition: SimpleZerosFunction = ({
         }
     }
 
-    return { iterations, interval: [a, b] };
+    return { iterations, interval: [a.toPrecision(21), b.toPrecision(21)] };
 };
 
 type NewtonRaphson = (params: {
@@ -104,7 +102,7 @@ type NewtonRaphson = (params: {
 }) => [
     results: {
         iterations: number;
-        x: number;
+        x: string;
     },
     details: Array<{
         iteration: number;
@@ -153,5 +151,5 @@ export const newtonRaphson: NewtonRaphson = ({
             break;
     }
 
-    return [{ iterations, x }, details];
+    return [{ iterations, x: x.toPrecision(21) }, details];
 };
