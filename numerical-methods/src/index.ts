@@ -1,7 +1,7 @@
 import { derivative, evaluate } from 'mathjs';
 
 type SimpleZerosFunction = (info: {
-    func: (x: number) => number;
+    func: string;
     interval: [number, number];
     precision: number;
     options?: {
@@ -37,10 +37,10 @@ export const bisection: SimpleZerosFunction = ({
     }
 
     while (true) {
-        const results = [func(a), func(b)];
+        const results = [evaluate(func, { x: a }), evaluate(func, { x: b })];
 
         const midPoint = (a + b) / 2;
-        const midResult = func(midPoint);
+        const midResult = evaluate(func, { x: midPoint });
 
         iterations += 1;
         const condition1 = Math.abs(b - a);
@@ -88,10 +88,10 @@ export const falsePosition: SimpleZerosFunction = ({
     let iterations = -1;
 
     while (true) {
-        const results = [func(a), func(b)];
+        const results = [evaluate(func, { x: a }), evaluate(func, { x: b })];
 
         const newPoint = (a * results[1] - b * results[0]) / (results[1] - results[0]);
-        const newResult = func(newPoint);
+        const newResult = evaluate(func, { x: newPoint });
 
         iterations += 1;
         const condition1 = Math.abs(b - a);
