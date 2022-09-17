@@ -13,13 +13,12 @@ export const bisection: SimpleZerosFunction = ({
     func,
     interval: [a, b],
     precision,
-    options = { maxIterations: Infinity },
+    options: { maxIterations } = { maxIterations: Infinity },
 }) => {
-    let condition1, condition2;
     let iterations = 0;
 
     const minIterations = Math.ceil((Math.log10(b - a) - Math.log10(precision)) / Math.log10(2));
-    if (options.maxIterations < minIterations) {
+    if (maxIterations < minIterations) {
         throw new Error(
             `The given maximum iterations is less than the minimum iterations (${minIterations}) for the given parameters.`,
         );
@@ -27,13 +26,6 @@ export const bisection: SimpleZerosFunction = ({
 
     while (true) {
         const results = [func(a), func(b)];
-
-        condition1 = Math.abs(b - a) < precision;
-        condition2 = Math.abs(results[1]) < precision;
-        if (condition1 || condition2) break;
-
-        iterations += 1;
-        if (iterations >= options.maxIterations) break;
 
         const midPoint = (a + b) / 2;
         const midResult = func(midPoint);
@@ -45,6 +37,12 @@ export const bisection: SimpleZerosFunction = ({
                 b = midPoint;
                 break;
         }
+
+        iterations += 1;
+        const condition1 = Math.abs(b - a) < precision;
+        const condition2 = Math.abs(results[1]) < precision;
+
+        if (condition1 || condition2 || iterations >= maxIterations) break;
     }
 
     if (iterations < minIterations) {
@@ -60,24 +58,14 @@ export const falsePosition: SimpleZerosFunction = ({
     func,
     interval: [a, b],
     precision,
-    options = { maxIterations: Infinity },
+    options: { maxIterations } = { maxIterations: Infinity },
 }) => {
-    let condition1, condition2;
     let iterations = 0;
 
     while (true) {
         const results = [func(a), func(b)];
 
-        condition1 = Math.abs(b - a) < precision;
-        condition2 = Math.abs(results[0]) < precision;
-        if (condition1 || condition2) break;
-
-        iterations += 1;
-        if (iterations >= options.maxIterations) {
-            break;
-        }
-
-        const newPoint = (a * func(b) - b * func(a)) / (func(b) - func(a));
+        const newPoint = (a * results[1] - b * results[0]) / (results[1] - results[0]);
         const newResult = func(newPoint);
         switch (Math.sign(newResult)) {
             case Math.sign(results[0]):
@@ -87,6 +75,12 @@ export const falsePosition: SimpleZerosFunction = ({
                 b = newPoint;
                 break;
         }
+
+        iterations += 1;
+        const condition1 = Math.abs(b - a) < precision;
+        const condition2 = Math.abs(results[0]) < precision;
+
+        if (condition1 || condition2 || iterations >= maxIterations) break;
     }
 
     return { iterations, interval: [a.toPrecision(21), b.toPrecision(21)] };
@@ -123,17 +117,15 @@ export const newtonRaphson: NewtonRaphson = ({
 }) => {
     const details = [];
     let iterations = -1;
-    let prevX;
 
     while (true) {
         const y = evaluate(func, { x });
         const diffY = derivative(func, 'x').evaluate({ x });
 
-        prevX = x;
+        const prevX = x;
         x -= evaluate(func, { x }) / diffY;
 
         iterations += 1;
-
         const condition1 = Math.abs(x - prevX);
         const condition2 = Math.abs(evaluate(func, { x }));
 
