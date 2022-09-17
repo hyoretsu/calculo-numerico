@@ -27,7 +27,7 @@ export const bisection: SimpleZerosFunction = ({
     options: { maxIterations } = { maxIterations: Infinity },
 }) => {
     const details = [];
-    let iterations = 0;
+    let iterations = -1;
 
     const minIterations = Math.ceil((Math.log10(b - a) - Math.log10(precision)) / Math.log10(2));
     if (maxIterations < minIterations) {
@@ -41,18 +41,10 @@ export const bisection: SimpleZerosFunction = ({
 
         const midPoint = (a + b) / 2;
         const midResult = func(midPoint);
-        switch (Math.sign(midResult)) {
-            case Math.sign(results[0]):
-                a = midPoint;
-                break;
-            case Math.sign(results[1]):
-                b = midPoint;
-                break;
-        }
 
         iterations += 1;
         const condition1 = Math.abs(b - a);
-        const condition2 = Math.abs(results[1]);
+        const condition2 = Math.abs(midResult);
 
         details.push({
             iteration: iterations,
@@ -64,7 +56,17 @@ export const bisection: SimpleZerosFunction = ({
             condition2,
         });
 
-        if (condition1 < precision || condition2 < precision || iterations >= maxIterations) break;
+        if ((condition1 < precision && condition2 < precision) || iterations >= maxIterations)
+            break;
+
+        switch (Math.sign(midResult)) {
+            case Math.sign(results[0]):
+                a = midPoint;
+                break;
+            case Math.sign(results[1]):
+                b = midPoint;
+                break;
+        }
     }
 
     if (iterations < minIterations) {
@@ -83,25 +85,17 @@ export const falsePosition: SimpleZerosFunction = ({
     options: { maxIterations } = { maxIterations: Infinity },
 }) => {
     const details = [];
-    let iterations = 0;
+    let iterations = -1;
 
     while (true) {
         const results = [func(a), func(b)];
 
         const newPoint = (a * results[1] - b * results[0]) / (results[1] - results[0]);
         const newResult = func(newPoint);
-        switch (Math.sign(newResult)) {
-            case Math.sign(results[0]):
-                a = newPoint;
-                break;
-            case Math.sign(results[1]):
-                b = newPoint;
-                break;
-        }
 
         iterations += 1;
         const condition1 = Math.abs(b - a);
-        const condition2 = Math.abs(results[0]);
+        const condition2 = Math.abs(newResult);
 
         details.push({
             iteration: iterations,
@@ -113,7 +107,17 @@ export const falsePosition: SimpleZerosFunction = ({
             condition2,
         });
 
-        if (condition1 < precision || condition2 < precision || iterations >= maxIterations) break;
+        if ((condition1 < precision && condition2 < precision) || iterations >= maxIterations)
+            break;
+
+        switch (Math.sign(newResult)) {
+            case Math.sign(results[0]):
+                a = newPoint;
+                break;
+            case Math.sign(results[1]):
+                b = newPoint;
+                break;
+        }
     }
 
     return [{ iterations, interval: [a.toPrecision(21), b.toPrecision(21)] }, details];
