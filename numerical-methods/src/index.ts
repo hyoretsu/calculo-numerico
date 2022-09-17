@@ -7,7 +7,18 @@ type SimpleZerosFunction = (info: {
     options?: {
         maxIterations: number;
     };
-}) => { iterations: number; interval: [string, string] };
+}) => [
+    results: { iterations: number; interval: [string, string] },
+    details: Array<{
+        iteration: number;
+        interval: number[];
+        results: number[];
+        x: number;
+        y: number;
+        condition1: number;
+        condition2: number;
+    }>,
+];
 
 export const bisection: SimpleZerosFunction = ({
     func,
@@ -15,6 +26,7 @@ export const bisection: SimpleZerosFunction = ({
     precision,
     options: { maxIterations } = { maxIterations: Infinity },
 }) => {
+    const details = [];
     let iterations = 0;
 
     const minIterations = Math.ceil((Math.log10(b - a) - Math.log10(precision)) / Math.log10(2));
@@ -39,10 +51,20 @@ export const bisection: SimpleZerosFunction = ({
         }
 
         iterations += 1;
-        const condition1 = Math.abs(b - a) < precision;
-        const condition2 = Math.abs(results[1]) < precision;
+        const condition1 = Math.abs(b - a);
+        const condition2 = Math.abs(results[1]);
 
-        if (condition1 || condition2 || iterations >= maxIterations) break;
+        details.push({
+            iteration: iterations,
+            interval: [a, b],
+            results,
+            x: midPoint,
+            y: midResult,
+            condition1,
+            condition2,
+        });
+
+        if (condition1 < precision || condition2 < precision || iterations >= maxIterations) break;
     }
 
     if (iterations < minIterations) {
@@ -51,7 +73,7 @@ export const bisection: SimpleZerosFunction = ({
         );
     }
 
-    return { iterations, interval: [a.toPrecision(21), b.toPrecision(21)] };
+    return [{ iterations, interval: [a.toPrecision(21), b.toPrecision(21)] }, details];
 };
 
 export const falsePosition: SimpleZerosFunction = ({
@@ -60,6 +82,7 @@ export const falsePosition: SimpleZerosFunction = ({
     precision,
     options: { maxIterations } = { maxIterations: Infinity },
 }) => {
+    const details = [];
     let iterations = 0;
 
     while (true) {
@@ -77,13 +100,23 @@ export const falsePosition: SimpleZerosFunction = ({
         }
 
         iterations += 1;
-        const condition1 = Math.abs(b - a) < precision;
-        const condition2 = Math.abs(results[0]) < precision;
+        const condition1 = Math.abs(b - a);
+        const condition2 = Math.abs(results[0]);
 
-        if (condition1 || condition2 || iterations >= maxIterations) break;
+        details.push({
+            iteration: iterations,
+            interval: [a, b],
+            results,
+            x: newPoint,
+            y: newResult,
+            condition1,
+            condition2,
+        });
+
+        if (condition1 < precision || condition2 < precision || iterations >= maxIterations) break;
     }
 
-    return { iterations, interval: [a.toPrecision(21), b.toPrecision(21)] };
+    return [{ iterations, interval: [a.toPrecision(21), b.toPrecision(21)] }, details];
 };
 
 type NewtonRaphson = (params: {
