@@ -141,9 +141,9 @@ type NewtonRaphson = (params: {
     details: Array<{
         iteration: number;
         prevX: number;
-        x: number;
-        y: number;
+        prevY: number;
         diffY: number;
+        x: number;
         condition1: number;
         condition2: number;
     }>,
@@ -172,9 +172,9 @@ export const newtonRaphson: NewtonRaphson = ({
         details.push({
             iteration: iterations,
             prevX,
-            x,
-            y,
+            prevY: y,
             diffY,
+            x,
             condition1,
             condition2,
         });
