@@ -185,3 +185,66 @@ export const newtonRaphson: NewtonRaphson = ({
 
     return [{ iterations, x: x.toPrecision(21) }, details];
 };
+
+type Secant = (params: {
+    func: string;
+    interval: number[];
+    precision: number;
+    options?: {
+        maxIterations: number;
+    };
+}) => [
+    results: {
+        iterations: number;
+        interval: [string, string];
+    },
+    details: Array<{
+        iteration: number;
+        interval: number[];
+        results: number[];
+        x: number;
+        condition1: number;
+        condition2: number;
+    }>,
+];
+
+export const secant: Secant = ({
+    func,
+    interval: [a, b],
+    precision,
+    options: { maxIterations } = { maxIterations: Infinity },
+}) => {
+    const details = [];
+    let iterations = -1;
+    console.log(precision);
+
+    while (true) {
+        const results = [evaluate(func, { x: a }), evaluate(func, { x: b })];
+
+        const c = (a * results[1] - b * results[0]) / (results[1] - results[0]);
+
+        iterations += 1;
+        const condition1 = Math.abs(c - a);
+        const condition2 = Math.abs(evaluate(func, { x: c }));
+
+        details.push({
+            iteration: iterations,
+            interval: [a, b],
+            results,
+            x: c,
+            condition1,
+            condition2,
+        });
+
+        console.log([condition1, condition2]);
+        console.log([condition1 < precision, condition2 < precision]);
+
+        if ((condition1 < precision && condition2 < precision) || iterations >= maxIterations)
+            break;
+
+        a = b;
+        b = c;
+    }
+
+    return [{ iterations, interval: [a.toPrecision(21), b.toPrecision(21)] }, details];
+};
