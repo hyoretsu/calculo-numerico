@@ -216,7 +216,6 @@ export const secant: Secant = ({
 }) => {
     const details = [];
     let iterations = -1;
-    console.log(precision);
 
     while (true) {
         const results = [evaluate(func, { x: a }), evaluate(func, { x: b })];
@@ -235,9 +234,6 @@ export const secant: Secant = ({
             condition1,
             condition2,
         });
-
-        console.log([condition1, condition2]);
-        console.log([condition1 < precision, condition2 < precision]);
 
         if ((condition1 < precision && condition2 < precision) || iterations >= maxIterations)
             break;
