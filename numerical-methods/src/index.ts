@@ -2,13 +2,16 @@ import { derivative, evaluate } from 'mathjs';
 
 type SimpleZerosFunction = (info: {
     func: string;
-    interval: [number, number];
+    interval: number[];
     precision: number;
     options?: {
         maxIterations: number;
     };
 }) => [
-    results: { iterations: number; interval: [string, string] },
+    results: {
+        iterations: number;
+        interval: [string, string];
+    },
     details: Array<{
         iteration: number;
         interval: number[];
