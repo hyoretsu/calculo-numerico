@@ -7,11 +7,10 @@ const start = Date.now();
 try {
     build({
         entryPoints: ['./src/'],
-        bundle: true,
         keepNames: true,
         minify: true,
-        platform: 'node',
         outfile: 'dist/index.js',
+        platform: 'node',
     }).then(() => console.log('⚡ ' + '\x1b[32m' + `Done in ${Date.now() - start}ms`));
 } catch (e) {
     console.log(e);
