@@ -1,12 +1,17 @@
 import { derivative, evaluate } from 'mathjs';
 
+interface Options {
+    /** Stop iterating as soon as any of the conditions are true. */
+    bail?: boolean;
+    /** Maximum number of iterations. */
+    maxIterations?: number;
+}
+
 type SimpleZerosFunction = (info: {
     func: string;
     interval: number[];
     precision: number;
-    options?: {
-        maxIterations: number;
-    };
+    options?: Options;
 }) => [
     results: {
         iterations: number;
@@ -27,7 +32,7 @@ export const bisection: SimpleZerosFunction = ({
     func,
     interval: [a, b],
     precision,
-    options: { maxIterations } = { maxIterations: Infinity },
+    options: { bail = false, maxIterations = Infinity } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -59,7 +64,11 @@ export const bisection: SimpleZerosFunction = ({
             condition2,
         });
 
-        if ((condition1 < precision && condition2 < precision) || iterations >= maxIterations)
+        if (
+            (!bail && condition1 < precision && condition2 < precision) ||
+            (bail && (condition1 < precision || condition2 < precision)) ||
+            iterations >= maxIterations
+        )
             break;
 
         switch (Math.sign(midResult)) {
@@ -85,7 +94,7 @@ export const falsePosition: SimpleZerosFunction = ({
     func,
     interval: [a, b],
     precision,
-    options: { maxIterations } = { maxIterations: Infinity },
+    options: { bail = false, maxIterations = Infinity } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -110,7 +119,11 @@ export const falsePosition: SimpleZerosFunction = ({
             condition2,
         });
 
-        if ((condition1 < precision && condition2 < precision) || iterations >= maxIterations)
+        if (
+            (!bail && condition1 < precision && condition2 < precision) ||
+            (bail && (condition1 < precision || condition2 < precision)) ||
+            iterations >= maxIterations
+        )
             break;
 
         switch (Math.sign(newResult)) {
@@ -130,9 +143,7 @@ type NewtonRaphson = (params: {
     func: string;
     initialX: number;
     precision: number;
-    options?: {
-        maxIterations: number;
-    };
+    options?: Options;
 }) => [
     results: {
         iterations: number;
@@ -153,7 +164,7 @@ export const newtonRaphson: NewtonRaphson = ({
     func,
     initialX: x,
     precision,
-    options: { maxIterations } = { maxIterations: Infinity },
+    options: { bail = false, maxIterations = Infinity } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -179,7 +190,11 @@ export const newtonRaphson: NewtonRaphson = ({
             condition2,
         });
 
-        if ((condition1 < precision && condition2 < precision) || iterations >= maxIterations)
+        if (
+            (!bail && condition1 < precision && condition2 < precision) ||
+            (bail && (condition1 < precision || condition2 < precision)) ||
+            iterations >= maxIterations
+        )
             break;
     }
 
@@ -190,9 +205,7 @@ type Secant = (params: {
     func: string;
     interval: number[];
     precision: number;
-    options?: {
-        maxIterations: number;
-    };
+    options?: Options;
 }) => [
     results: {
         iterations: number;
@@ -212,7 +225,7 @@ export const secant: Secant = ({
     func,
     interval: [a, b],
     precision,
-    options: { maxIterations } = { maxIterations: Infinity },
+    options: { bail = false, maxIterations = Infinity } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -235,7 +248,11 @@ export const secant: Secant = ({
             condition2,
         });
 
-        if ((condition1 < precision && condition2 < precision) || iterations >= maxIterations)
+        if (
+            (!bail && condition1 < precision && condition2 < precision) ||
+            (bail && (condition1 < precision || condition2 < precision)) ||
+            iterations >= maxIterations
+        )
             break;
 
         a = b;
