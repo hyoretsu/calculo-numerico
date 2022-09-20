@@ -3,6 +3,8 @@ import { derivative, evaluate } from 'mathjs';
 interface Options {
     /** Stop iterating as soon as any of the conditions are true. */
     bail?: boolean;
+    /** Which conditions you want to consider when iterating. */
+    conditionsWhitelist?: boolean[];
     /** Maximum number of iterations. */
     maxIterations?: number;
 }
@@ -32,7 +34,7 @@ export const bisection: SimpleZerosFunction = ({
     func,
     interval: [a, b],
     precision,
-    options: { bail = false, maxIterations = Infinity } = {},
+    options: { bail = false, conditionsWhitelist = [true, true], maxIterations = Infinity } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -64,9 +66,13 @@ export const bisection: SimpleZerosFunction = ({
             condition2,
         });
 
+        // Check if conditions are either disabled or true
+        const condition1Pass = !conditionsWhitelist[0] || condition1 < precision;
+        const condition2Pass = !conditionsWhitelist[1] || condition2 < precision;
+
         if (
-            (!bail && condition1 < precision && condition2 < precision) ||
-            (bail && (condition1 < precision || condition2 < precision)) ||
+            (!bail && condition1Pass && condition2Pass) ||
+            (bail && (condition1Pass || condition2Pass)) ||
             iterations >= maxIterations
         )
             break;
@@ -94,7 +100,7 @@ export const falsePosition: SimpleZerosFunction = ({
     func,
     interval: [a, b],
     precision,
-    options: { bail = false, maxIterations = Infinity } = {},
+    options: { bail = false, conditionsWhitelist = [true, true], maxIterations = Infinity } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -119,9 +125,13 @@ export const falsePosition: SimpleZerosFunction = ({
             condition2,
         });
 
+        // Check if conditions are either disabled or true
+        const condition1Pass = !conditionsWhitelist[0] || condition1 < precision;
+        const condition2Pass = !conditionsWhitelist[1] || condition2 < precision;
+
         if (
-            (!bail && condition1 < precision && condition2 < precision) ||
-            (bail && (condition1 < precision || condition2 < precision)) ||
+            (!bail && condition1Pass && condition2Pass) ||
+            (bail && (condition1Pass || condition2Pass)) ||
             iterations >= maxIterations
         )
             break;
@@ -164,7 +174,7 @@ export const newtonRaphson: NewtonRaphson = ({
     func,
     initialX: x,
     precision,
-    options: { bail = false, maxIterations = Infinity } = {},
+    options: { bail = false, conditionsWhitelist = [true, true], maxIterations = Infinity } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -190,9 +200,13 @@ export const newtonRaphson: NewtonRaphson = ({
             condition2,
         });
 
+        // Check if conditions are either disabled or true
+        const condition1Pass = !conditionsWhitelist[0] || condition1 < precision;
+        const condition2Pass = !conditionsWhitelist[1] || condition2 < precision;
+
         if (
-            (!bail && condition1 < precision && condition2 < precision) ||
-            (bail && (condition1 < precision || condition2 < precision)) ||
+            (!bail && condition1Pass && condition2Pass) ||
+            (bail && (condition1Pass || condition2Pass)) ||
             iterations >= maxIterations
         )
             break;
@@ -225,7 +239,7 @@ export const secant: Secant = ({
     func,
     interval: [a, b],
     precision,
-    options: { bail = false, maxIterations = Infinity } = {},
+    options: { bail = false, conditionsWhitelist = [true, true], maxIterations = Infinity } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -248,9 +262,13 @@ export const secant: Secant = ({
             condition2,
         });
 
+        // Check if conditions are either disabled or true
+        const condition1Pass = !conditionsWhitelist[0] || condition1 < precision;
+        const condition2Pass = !conditionsWhitelist[1] || condition2 < precision;
+
         if (
-            (!bail && condition1 < precision && condition2 < precision) ||
-            (bail && (condition1 < precision || condition2 < precision)) ||
+            (!bail && condition1Pass && condition2Pass) ||
+            (bail && (condition1Pass || condition2Pass)) ||
             iterations >= maxIterations
         )
             break;
