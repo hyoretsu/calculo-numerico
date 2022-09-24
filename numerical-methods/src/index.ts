@@ -39,13 +39,6 @@ export const bisection: SimpleZerosFunction = ({
     const details = [];
     let iterations = -1;
 
-    const minIterations = Math.ceil((Math.log10(b - a) - Math.log10(precision)) / Math.log10(2));
-    if (maxIterations < minIterations) {
-        throw new Error(
-            `The given maximum iterations is less than the minimum iterations (${minIterations}) for the given parameters.`,
-        );
-    }
-
     while (true) {
         const results = [evaluate(func, { x: a }), evaluate(func, { x: b })];
 
@@ -87,7 +80,8 @@ export const bisection: SimpleZerosFunction = ({
         }
     }
 
-    if (iterations < minIterations) {
+    const minIterations = Math.ceil((Math.log10(b - a) - Math.log10(precision)) / Math.log10(2));
+    if (iterations < minIterations && maxIterations === Infinity) {
         throw new Error(
             `Something went wrong, less iterations than the minimum (${minIterations}) were done.`,
         );
