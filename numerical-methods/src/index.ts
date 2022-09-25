@@ -4,6 +4,7 @@ interface Details {
     iteration: number;
     x: number;
     y?: number;
+    relativeError?: number;
     condition1: number;
     condition2: number;
 }
@@ -17,6 +18,8 @@ interface Options {
     maxIterations?: number;
     /** For instances where you're iterating over a different function, but still want the results from the original one e.g. iterating over a differentiated function to find a maximum value from the original. */
     origFunc?: string;
+    /** Outputs the relative error between the new X and the last X or the true X, if given. */
+    relativeError?: number | boolean;
 }
 
 type SimpleZerosFunction = (info: {
@@ -46,12 +49,15 @@ export const bisection: SimpleZerosFunction = ({
         conditionsWhitelist = [true, true],
         maxIterations = Infinity,
         origFunc,
+        relativeError,
     } = {},
 }) => {
     const details = [];
     let iterations = -1;
+    let trueX = typeof relativeError === 'number' && relativeError;
 
     while (true) {
+        const interval = [a, b];
         const results = [evaluate(func, { x: a }), evaluate(func, { x: b })];
 
         const midPoint = (a + b) / 2;
@@ -61,12 +67,34 @@ export const bisection: SimpleZerosFunction = ({
         const condition1 = Math.abs(b - a);
         const condition2 = Math.abs(evaluate(func, { x: midPoint }));
 
+        switch (Math.sign(midResult)) {
+            case Math.sign(results[0]):
+                if (relativeError) {
+                    if (!trueX) trueX = a;
+
+                    relativeError = Math.abs(midPoint - trueX) / Math.abs(midPoint);
+                }
+
+                a = midPoint;
+                break;
+            case Math.sign(results[1]):
+                if (relativeError) {
+                    if (!trueX) trueX = b;
+
+                    relativeError = Math.abs(midPoint - trueX) / Math.abs(midPoint);
+                }
+
+                b = midPoint;
+                break;
+        }
+
         details.push({
             iteration: iterations,
-            interval: [a, b],
+            interval,
             results,
             x: midPoint,
             ...(origFunc && { y: evaluate(origFunc, { x: midPoint }) }),
+            ...(relativeError && { relativeError: relativeError as number }),
             condition1,
             condition2,
         });
@@ -81,15 +109,6 @@ export const bisection: SimpleZerosFunction = ({
             iterations >= maxIterations
         )
             break;
-
-        switch (Math.sign(midResult)) {
-            case Math.sign(results[0]):
-                a = midPoint;
-                break;
-            case Math.sign(results[1]):
-                b = midPoint;
-                break;
-        }
     }
 
     const minIterations = Math.ceil((Math.log10(b - a) - Math.log10(precision)) / Math.log10(2));
@@ -99,7 +118,13 @@ export const bisection: SimpleZerosFunction = ({
         );
     }
 
-    return [{ iterations, interval: [a.toPrecision(21), b.toPrecision(21)] }, details];
+    return [
+        {
+            iterations,
+            interval: [a.toPrecision(21), b.toPrecision(21)],
+        },
+        details,
+    ];
 };
 
 export const falsePosition: SimpleZerosFunction = ({
@@ -111,12 +136,15 @@ export const falsePosition: SimpleZerosFunction = ({
         conditionsWhitelist = [true, true],
         maxIterations = Infinity,
         origFunc,
+        relativeError = false,
     } = {},
 }) => {
     const details = [];
     let iterations = -1;
+    let trueX = typeof relativeError === 'number' && relativeError;
 
     while (true) {
+        const interval = [a, b];
         const results = [evaluate(func, { x: a }), evaluate(func, { x: b })];
 
         const newPoint = (a * results[1] - b * results[0]) / (results[1] - results[0]);
@@ -126,12 +154,34 @@ export const falsePosition: SimpleZerosFunction = ({
         const condition1 = Math.abs(b - a);
         const condition2 = Math.abs(evaluate(func, { x: newPoint }));
 
+        switch (Math.sign(newResult)) {
+            case Math.sign(results[0]):
+                if (relativeError) {
+                    if (!trueX) trueX = a;
+
+                    relativeError = Math.abs(newPoint - trueX) / Math.abs(newPoint);
+                }
+
+                a = newPoint;
+                break;
+            case Math.sign(results[1]):
+                if (relativeError) {
+                    if (!trueX) trueX = b;
+
+                    relativeError = Math.abs(newPoint - trueX) / Math.abs(newPoint);
+                }
+
+                b = newPoint;
+                break;
+        }
+
         details.push({
             iteration: iterations,
-            interval: [a, b],
+            interval,
             results,
             x: newPoint,
             ...(origFunc && { y: evaluate(origFunc, { x: newPoint }) }),
+            ...(relativeError && { relativeError: relativeError as number }),
             condition1,
             condition2,
         });
@@ -146,18 +196,15 @@ export const falsePosition: SimpleZerosFunction = ({
             iterations >= maxIterations
         )
             break;
-
-        switch (Math.sign(newResult)) {
-            case Math.sign(results[0]):
-                a = newPoint;
-                break;
-            case Math.sign(results[1]):
-                b = newPoint;
-                break;
-        }
     }
 
-    return [{ iterations, interval: [a.toPrecision(21), b.toPrecision(21)] }, details];
+    return [
+        {
+            iterations,
+            interval: [a.toPrecision(21), b.toPrecision(21)],
+        },
+        details,
+    ];
 };
 
 type NewtonRaphson = (params: {
@@ -188,10 +235,12 @@ export const newtonRaphson: NewtonRaphson = ({
         conditionsWhitelist = [true, true],
         maxIterations = Infinity,
         origFunc,
+        relativeError = false,
     } = {},
 }) => {
     const details = [];
     let iterations = -1;
+    let trueX = typeof relativeError === 'number' && relativeError;
 
     while (true) {
         const prevY = evaluate(func, { x });
@@ -204,6 +253,12 @@ export const newtonRaphson: NewtonRaphson = ({
         const condition1 = Math.abs(x - prevX);
         const condition2 = Math.abs(evaluate(func, { x }));
 
+        if (relativeError) {
+            if (!trueX) trueX = prevX;
+
+            relativeError = Math.abs(x - trueX) / Math.abs(x);
+        }
+
         details.push({
             iteration: iterations,
             prevX,
@@ -211,6 +266,7 @@ export const newtonRaphson: NewtonRaphson = ({
             diffY,
             x,
             ...(origFunc && { y: evaluate(origFunc, { x }) }),
+            ...(relativeError && { relativeError: relativeError as number }),
             condition1,
             condition2,
         });
@@ -227,7 +283,13 @@ export const newtonRaphson: NewtonRaphson = ({
             break;
     }
 
-    return [{ iterations, x: x.toPrecision(21) }, details];
+    return [
+        {
+            iterations,
+            x: x.toPrecision(21),
+        },
+        details,
+    ];
 };
 
 type Secant = (params: {
@@ -257,10 +319,12 @@ export const secant: Secant = ({
         conditionsWhitelist = [true, true],
         maxIterations = Infinity,
         origFunc,
+        relativeError = false,
     } = {},
 }) => {
     const details = [];
     let iterations = -1;
+    let trueX = typeof relativeError === 'number' && relativeError;
 
     while (true) {
         const results = [evaluate(func, { x: a }), evaluate(func, { x: b })];
@@ -271,12 +335,19 @@ export const secant: Secant = ({
         const condition1 = Math.abs(c - a);
         const condition2 = Math.abs(evaluate(func, { x: c }));
 
+        if (relativeError) {
+            if (!trueX) trueX = b;
+
+            relativeError = Math.abs(c - trueX) / Math.abs(c);
+        }
+
         details.push({
             iteration: iterations,
             interval: [a, b],
             results,
             x: c,
             ...(origFunc && { y: evaluate(origFunc, { x: c }) }),
+            ...(typeof relativeError === 'number' && { relativeError }),
             condition1,
             condition2,
         });
@@ -296,5 +367,11 @@ export const secant: Secant = ({
         b = c;
     }
 
-    return [{ iterations, interval: [a.toPrecision(21), b.toPrecision(21)] }, details];
+    return [
+        {
+            iterations,
+            interval: [a.toPrecision(21), b.toPrecision(21)],
+        },
+        details,
+    ];
 };
