@@ -7,6 +7,8 @@ interface Options {
     conditionsWhitelist?: boolean[];
     /** Maximum number of iterations. */
     maxIterations?: number;
+    /** For instances where you're iterating over a different function, but still want the results from the original one e.g. iterating over a differentiated function to find a maximum value from the original. */
+    origFunc?: string;
 }
 
 type SimpleZerosFunction = (info: {
@@ -24,7 +26,7 @@ type SimpleZerosFunction = (info: {
         interval: number[];
         results: number[];
         x: number;
-        y: number;
+        y?: number;
         condition1: number;
         condition2: number;
     }>,
@@ -34,7 +36,12 @@ export const bisection: SimpleZerosFunction = ({
     func,
     interval: [a, b],
     precision,
-    options: { bail = false, conditionsWhitelist = [true, true], maxIterations = Infinity } = {},
+    options: {
+        bail = false,
+        conditionsWhitelist = [true, true],
+        maxIterations = Infinity,
+        origFunc,
+    } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -47,14 +54,14 @@ export const bisection: SimpleZerosFunction = ({
 
         iterations += 1;
         const condition1 = Math.abs(b - a);
-        const condition2 = Math.abs(midResult);
+        const condition2 = Math.abs(evaluate(func, { x: midPoint }));
 
         details.push({
             iteration: iterations,
             interval: [a, b],
             results,
             x: midPoint,
-            y: midResult,
+            ...(origFunc && { y: evaluate(origFunc, { x: midPoint }) }),
             condition1,
             condition2,
         });
@@ -94,7 +101,12 @@ export const falsePosition: SimpleZerosFunction = ({
     func,
     interval: [a, b],
     precision,
-    options: { bail = false, conditionsWhitelist = [true, true], maxIterations = Infinity } = {},
+    options: {
+        bail = false,
+        conditionsWhitelist = [true, true],
+        maxIterations = Infinity,
+        origFunc,
+    } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -107,14 +119,14 @@ export const falsePosition: SimpleZerosFunction = ({
 
         iterations += 1;
         const condition1 = Math.abs(b - a);
-        const condition2 = Math.abs(newResult);
+        const condition2 = Math.abs(evaluate(func, { x: newPoint }));
 
         details.push({
             iteration: iterations,
             interval: [a, b],
             results,
             x: newPoint,
-            y: newResult,
+            ...(origFunc && { y: evaluate(origFunc, { x: newPoint }) }),
             condition1,
             condition2,
         });
@@ -159,6 +171,7 @@ type NewtonRaphson = (params: {
         prevY: number;
         diffY: number;
         x: number;
+        y?: number;
         condition1: number;
         condition2: number;
     }>,
@@ -168,13 +181,18 @@ export const newtonRaphson: NewtonRaphson = ({
     func,
     initialX: x,
     precision,
-    options: { bail = false, conditionsWhitelist = [true, true], maxIterations = Infinity } = {},
+    options: {
+        bail = false,
+        conditionsWhitelist = [true, true],
+        maxIterations = Infinity,
+        origFunc,
+    } = {},
 }) => {
     const details = [];
     let iterations = -1;
 
     while (true) {
-        const y = evaluate(func, { x });
+        const prevY = evaluate(func, { x });
         const diffY = derivative(func, 'x').evaluate({ x });
 
         const prevX = x;
@@ -187,9 +205,10 @@ export const newtonRaphson: NewtonRaphson = ({
         details.push({
             iteration: iterations,
             prevX,
-            prevY: y,
+            prevY,
             diffY,
             x,
+            ...(origFunc && { y: evaluate(origFunc, { x }) }),
             condition1,
             condition2,
         });
@@ -224,6 +243,7 @@ type Secant = (params: {
         interval: number[];
         results: number[];
         x: number;
+        y?: number;
         condition1: number;
         condition2: number;
     }>,
@@ -233,7 +253,12 @@ export const secant: Secant = ({
     func,
     interval: [a, b],
     precision,
-    options: { bail = false, conditionsWhitelist = [true, true], maxIterations = Infinity } = {},
+    options: {
+        bail = false,
+        conditionsWhitelist = [true, true],
+        maxIterations = Infinity,
+        origFunc,
+    } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -252,6 +277,7 @@ export const secant: Secant = ({
             interval: [a, b],
             results,
             x: c,
+            ...(origFunc && { y: evaluate(origFunc, { x: c }) }),
             condition1,
             condition2,
         });
