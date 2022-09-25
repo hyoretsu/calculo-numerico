@@ -1,5 +1,13 @@
 import { derivative, evaluate } from 'mathjs';
 
+interface Details {
+    iteration: number;
+    x: number;
+    y?: number;
+    condition1: number;
+    condition2: number;
+}
+
 interface Options {
     /** Stop iterating as soon as any of the conditions are true. */
     bail?: boolean;
@@ -21,15 +29,12 @@ type SimpleZerosFunction = (info: {
         iterations: number;
         interval: [string, string];
     },
-    details: Array<{
-        iteration: number;
-        interval: number[];
-        results: number[];
-        x: number;
-        y?: number;
-        condition1: number;
-        condition2: number;
-    }>,
+    details: Array<
+        Details & {
+            interval: number[];
+            results: number[];
+        }
+    >,
 ];
 
 export const bisection: SimpleZerosFunction = ({
@@ -165,16 +170,13 @@ type NewtonRaphson = (params: {
         iterations: number;
         x: string;
     },
-    details: Array<{
-        iteration: number;
-        prevX: number;
-        prevY: number;
-        diffY: number;
-        x: number;
-        y?: number;
-        condition1: number;
-        condition2: number;
-    }>,
+    details: Array<
+        Details & {
+            prevX: number;
+            prevY: number;
+            diffY: number;
+        }
+    >,
 ];
 
 export const newtonRaphson: NewtonRaphson = ({
@@ -238,15 +240,12 @@ type Secant = (params: {
         iterations: number;
         interval: [string, string];
     },
-    details: Array<{
-        iteration: number;
-        interval: number[];
-        results: number[];
-        x: number;
-        y?: number;
-        condition1: number;
-        condition2: number;
-    }>,
+    details: Array<
+        Details & {
+            interval: number[];
+            results: number[];
+        }
+    >,
 ];
 
 export const secant: Secant = ({
