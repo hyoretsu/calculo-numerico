@@ -14,7 +14,6 @@ export const lagrangeInterpolation: LagrangeInterpolation = ({ x, y, targetX }) 
             x.forEach((_, j) => {
                 if (j === i) return;
 
-                // numerator += `${!numerator ? '' : '* '}(x - ${x[j]})`;
                 numerator += `(x - ${x[j]})`;
                 denominator *= x[i] - x[j];
             });
