@@ -120,7 +120,7 @@ export const gaussSeidel: GaussMethod = ({
             String(number / coefficients[i][i]),
         ].join('');
     });
-    const solution = [0, 0];
+    const solution = independentTerms.map(_ => 0);
 
     while (true) {
         const prevSolution = [...solution];
