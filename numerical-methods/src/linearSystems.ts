@@ -101,7 +101,7 @@ export const gaussSeidel: GaussMethod = ({
     options: { maxIterations = Infinity } = {},
 }) => {
     const details = [];
-    let iterations = -1;
+    let iterations = 0;
 
     const dimension = independentTerms.length;
     const iterationFunc = independentTerms.map((number, i) => {
