@@ -9,7 +9,8 @@ import { range } from './utils';
 
 interface Details {
     iteration: number;
-    solution: number[];
+    currentGuess: number[];
+    nextGuess: number[];
     absoluteError: number;
     relativeError?: number;
 }
@@ -57,15 +58,15 @@ export const gaussJacobi: GaussMethod = ({
             String(number / coefficients[i][i]),
         ].join('');
     });
-    let solution = independentTerms.map((number, i) => number / coefficients[i][i]);
+    let guess = independentTerms.map((number, i) => number / coefficients[i][i]);
 
     while (true) {
-        const prevSolution = solution;
+        const prevGuess = guess;
 
-        solution = iterationFunc.map((func, i) =>
+        guess = iterationFunc.map((func, i) =>
             evaluate(
                 func,
-                solution.reduce((prev, curr) => {
+                guess.reduce((prev, curr) => {
                     return {
                         ...prev,
                         [String.fromCharCode('a'.charCodeAt(0) + Object.entries(prev).length)]:
@@ -77,16 +78,17 @@ export const gaussJacobi: GaussMethod = ({
 
         iterations += 1;
         const absoluteError = Math.max(
-            ...solution.map((current, i) => Math.abs(current - prevSolution[i])),
+            ...guess.map((current, i) => Math.abs(current - prevGuess[i])),
         );
 
         if (relativeError) {
-            relativeError = absoluteError / Math.max(...solution);
+            relativeError = absoluteError / Math.max(...guess);
         }
 
         details.push({
             iteration: iterations,
-            solution: prevSolution,
+            currentGuess: prevGuess,
+            nextGuess: guess,
             absoluteError,
             ...(typeof relativeError === 'number' && { relativeError }),
         });
@@ -94,7 +96,7 @@ export const gaussJacobi: GaussMethod = ({
         if (absoluteError < precision || iterations >= maxIterations) break;
     }
 
-    return [{ iterations, iterationFunc, solution }, details];
+    return [{ iterations, iterationFunc, solution: guess }, details];
 };
 
 export const gaussSeidel: GaussMethod = ({
@@ -119,15 +121,15 @@ export const gaussSeidel: GaussMethod = ({
             String(number / coefficients[i][i]),
         ].join('');
     });
-    const solution = independentTerms.map(_ => 0);
+    const guess = independentTerms.map(_ => 0);
 
     while (true) {
-        const prevSolution = [...solution];
+        const prevGuess = [...guess];
 
         iterationFunc.forEach((func, i) => {
-            solution[i] = evaluate(
+            guess[i] = evaluate(
                 func,
-                solution.reduce(
+                guess.reduce(
                     (prev, curr) => ({
                         ...prev,
                         [String.fromCharCode('a'.charCodeAt(0) + Object.entries(prev).length)]:
@@ -140,16 +142,17 @@ export const gaussSeidel: GaussMethod = ({
 
         iterations += 1;
         const absoluteError = Math.max(
-            ...solution.map((current, i) => Math.abs(current - prevSolution[i])),
+            ...guess.map((current, i) => Math.abs(current - prevGuess[i])),
         );
 
         if (relativeError) {
-            relativeError = absoluteError / Math.max(...solution);
+            relativeError = absoluteError / Math.max(...guess);
         }
 
         details.push({
             iteration: iterations,
-            solution: prevSolution,
+            currentGuess: prevGuess,
+            nextGuess: guess,
             absoluteError,
             ...(typeof relativeError === 'number' && { relativeError }),
         });
@@ -157,5 +160,5 @@ export const gaussSeidel: GaussMethod = ({
         if ((iterations > 0 && absoluteError < precision) || iterations >= maxIterations) break;
     }
 
-    return [{ iterations, iterationFunc, solution }, details];
+    return [{ iterations, iterationFunc, solution: guess }, details];
 };
