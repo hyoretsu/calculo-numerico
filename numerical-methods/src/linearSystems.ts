@@ -57,7 +57,6 @@ export const gaussJacobi: GaussMethod = ({
             String(number / coefficients[i][i]),
         ].join('');
     });
-    console.log(iterationFunc);
     let solution = independentTerms.map((number, i) => number / coefficients[i][i]);
 
     while (true) {
