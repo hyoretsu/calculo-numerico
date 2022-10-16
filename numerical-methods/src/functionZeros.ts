@@ -1,5 +1,7 @@
 import { derivative, evaluate } from 'mathjs';
 
+import { fixNumber } from './utils';
+
 interface Details {
     iteration: number;
     x: number;
@@ -90,13 +92,13 @@ export const bisection: SimpleZerosFunction = ({
 
         details.push({
             iteration: iterations,
-            interval,
-            results,
-            x: midPoint,
+            interval: interval.map(number => fixNumber(number)),
+            results: results.map(number => fixNumber(number)),
+            x: fixNumber(midPoint),
             ...(origFunc && { y: evaluate(origFunc, { x: midPoint }) }),
-            ...(relativeError && { relativeError: relativeError as number }),
-            condition1,
-            condition2,
+            ...(relativeError && { relativeError: fixNumber(relativeError as number) }),
+            condition1: fixNumber(condition1),
+            condition2: fixNumber(condition2),
         });
 
         // Check if conditions are either disabled or true
@@ -177,13 +179,13 @@ export const falsePosition: SimpleZerosFunction = ({
 
         details.push({
             iteration: iterations,
-            interval,
-            results,
-            x: newPoint,
+            interval: interval.map(number => fixNumber(number)),
+            results: results.map(number => fixNumber(number)),
+            x: fixNumber(newPoint),
             ...(origFunc && { y: evaluate(origFunc, { x: newPoint }) }),
-            ...(relativeError && { relativeError: relativeError as number }),
-            condition1,
-            condition2,
+            ...(relativeError && { relativeError: fixNumber(relativeError as number) }),
+            condition1: fixNumber(condition1),
+            condition2: fixNumber(condition2),
         });
 
         // Check if conditions are either disabled or true
@@ -261,14 +263,14 @@ export const newtonRaphson: NewtonRaphson = ({
 
         details.push({
             iteration: iterations,
-            prevX,
-            prevY,
-            diffY,
-            x,
+            prevX: fixNumber(prevX),
+            prevY: fixNumber(prevY),
+            diffY: fixNumber(diffY),
+            x: fixNumber(x),
             ...(origFunc && { y: evaluate(origFunc, { x }) }),
-            ...(relativeError && { relativeError: relativeError as number }),
-            condition1,
-            condition2,
+            ...(relativeError && { relativeError: fixNumber(relativeError as number) }),
+            condition1: fixNumber(condition1),
+            condition2: fixNumber(condition2),
         });
 
         // Check if conditions are either disabled or true
@@ -343,13 +345,13 @@ export const secant: Secant = ({
 
         details.push({
             iteration: iterations,
-            interval: [a, b],
-            results,
-            x: c,
+            interval: [fixNumber(a), fixNumber(b)],
+            results: results.map(number => fixNumber(number)),
+            x: fixNumber(c),
             ...(origFunc && { y: evaluate(origFunc, { x: c }) }),
-            ...(typeof relativeError === 'number' && { relativeError }),
-            condition1,
-            condition2,
+            ...(typeof relativeError === 'number' && { relativeError: fixNumber(relativeError) }),
+            condition1: fixNumber(condition1),
+            condition2: fixNumber(condition2),
         });
 
         // Check if conditions are either disabled or true

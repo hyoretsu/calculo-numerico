@@ -5,7 +5,7 @@
 
 import { evaluate } from 'mathjs';
 
-import { range } from './utils';
+import { fixNumber, range } from './utils';
 
 interface Details {
     iteration: number;
@@ -82,10 +82,10 @@ export const gaussJacobi: GaussMethod = ({
 
         details.push({
             iteration: iterations,
-            currentGuess: prevGuess,
-            nextGuess: guess,
-            absoluteError,
-            relativeError,
+            currentGuess: prevGuess.map(number => fixNumber(number)),
+            nextGuess: guess.map(number => fixNumber(number)),
+            absoluteError: fixNumber(absoluteError),
+            relativeError: fixNumber(relativeError),
         });
 
         if (absoluteError < precision || iterations >= maxIterations) break;
@@ -143,10 +143,10 @@ export const gaussSeidel: GaussMethod = ({
 
         details.push({
             iteration: iterations,
-            currentGuess: prevGuess,
-            nextGuess: guess,
-            absoluteError,
-            relativeError,
+            currentGuess: prevGuess.map(number => fixNumber(number)),
+            nextGuess: guess.map(number => fixNumber(number)),
+            absoluteError: fixNumber(absoluteError),
+            relativeError: fixNumber(relativeError),
         });
 
         if ((iterations > 0 && absoluteError < precision) || iterations >= maxIterations) break;

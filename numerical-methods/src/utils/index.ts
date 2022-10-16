@@ -1,4 +1,11 @@
 /**
+ * Fixes an error that happens sometimes when you're working with numbers.
+ */
+export const fixNumber = (number: number): number => {
+    return Number(number.toPrecision(12));
+};
+
+/**
  * @param	start - A number specifying at which position to start. Default is 0.
  * When called alone, it acts like `range(stop)`
  * @param	stop - A number specifying at which position to stop (not included).

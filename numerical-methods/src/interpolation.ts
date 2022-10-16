@@ -1,5 +1,7 @@
 import { evaluate } from 'mathjs';
 
+import { fixNumber } from './utils';
+
 type LagrangeInterpolation = (data: { x: number[]; y: number[]; targetX?: number }) => {
     polynomial: string;
     result?: number;
@@ -25,7 +27,7 @@ export const lagrangeInterpolation: LagrangeInterpolation = ({ x, y, targetX }) 
     return {
         polynomial,
         ...(targetX && {
-            result: Number(evaluate(polynomial, { x: targetX }).toPrecision(15)),
+            result: fixNumber(evaluate(polynomial, { x: targetX })),
         }),
     };
 };
