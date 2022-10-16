@@ -12,14 +12,12 @@ interface Details {
     currentGuess: number[];
     nextGuess: number[];
     absoluteError: number;
-    relativeError?: number;
+    relativeError: number;
 }
 
 interface Options {
     /** Maximum number of iterations. */
     maxIterations?: number;
-    /** Outputs the relative error between the new X and the last X or the true X, if given. */
-    relativeError?: number | boolean;
 }
 
 type GaussMethod = (data: {
@@ -40,7 +38,7 @@ export const gaussJacobi: GaussMethod = ({
     coefficients,
     independentTerms,
     precision,
-    options: { maxIterations = Infinity, relativeError = false } = {},
+    options: { maxIterations = Infinity } = {},
 }) => {
     const details = [];
     let iterations = 0;
@@ -80,17 +78,14 @@ export const gaussJacobi: GaussMethod = ({
         const absoluteError = Math.max(
             ...guess.map((current, i) => Math.abs(current - prevGuess[i])),
         );
-
-        if (relativeError) {
-            relativeError = absoluteError / Math.max(...guess);
-        }
+        const relativeError = absoluteError / Math.max(...guess);
 
         details.push({
             iteration: iterations,
             currentGuess: prevGuess,
             nextGuess: guess,
             absoluteError,
-            ...(typeof relativeError === 'number' && { relativeError }),
+            relativeError,
         });
 
         if (absoluteError < precision || iterations >= maxIterations) break;
@@ -103,7 +98,7 @@ export const gaussSeidel: GaussMethod = ({
     coefficients,
     independentTerms,
     precision,
-    options: { maxIterations = Infinity, relativeError = false } = {},
+    options: { maxIterations = Infinity } = {},
 }) => {
     const details = [];
     let iterations = -1;
@@ -144,17 +139,14 @@ export const gaussSeidel: GaussMethod = ({
         const absoluteError = Math.max(
             ...guess.map((current, i) => Math.abs(current - prevGuess[i])),
         );
-
-        if (relativeError) {
-            relativeError = absoluteError / Math.max(...guess);
-        }
+        const relativeError = absoluteError / Math.max(...guess);
 
         details.push({
             iteration: iterations,
             currentGuess: prevGuess,
             nextGuess: guess,
             absoluteError,
-            ...(typeof relativeError === 'number' && { relativeError }),
+            relativeError,
         });
 
         if ((iterations > 0 && absoluteError < precision) || iterations >= maxIterations) break;
