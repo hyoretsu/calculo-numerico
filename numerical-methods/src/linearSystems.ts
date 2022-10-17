@@ -29,6 +29,7 @@ type GaussMethod = (data: {
     results: {
         iterations: number;
         iterationFunc: string[];
+        spectralRadius: number;
         solution: number[];
     },
     details: Array<Details>,
@@ -42,6 +43,16 @@ export const gaussJacobi: GaussMethod = ({
 }) => {
     const details = [];
     let iterations = 0;
+
+    const spectralRadius = Math.max(
+        ...coefficients.map(
+            (number, i) =>
+                number.reduce((prev, curr) => prev + Math.abs(curr), 0) / Math.abs(number[i]),
+        ),
+    );
+    if (spectralRadius >= 1) {
+        throw new Error('Convergence is only guaranteed for p(A) < 1.');
+    }
 
     const dimension = independentTerms.length;
     const iterationFunc = independentTerms.map((number, i) => {
@@ -91,7 +102,15 @@ export const gaussJacobi: GaussMethod = ({
         if (relativeError < precision || iterations >= maxIterations) break;
     }
 
-    return [{ iterations, iterationFunc, solution: guess }, details];
+    return [
+        {
+            iterations,
+            iterationFunc,
+            spectralRadius,
+            solution: guess,
+        },
+        details,
+    ];
 };
 
 export const gaussSeidel: GaussMethod = ({
@@ -102,6 +121,16 @@ export const gaussSeidel: GaussMethod = ({
 }) => {
     const details = [];
     let iterations = 0;
+
+    const spectralRadius = Math.max(
+        ...coefficients.map(
+            (number, i) =>
+                number.reduce((prev, curr) => prev + Math.abs(curr), 0) / Math.abs(number[i]),
+        ),
+    );
+    if (spectralRadius >= 1) {
+        throw new Error('Convergence is only guaranteed for p(A) < 1.');
+    }
 
     const dimension = independentTerms.length;
     const iterationFunc = independentTerms.map((number, i) => {
@@ -152,5 +181,13 @@ export const gaussSeidel: GaussMethod = ({
         if ((iterations > 0 && relativeError < precision) || iterations >= maxIterations) break;
     }
 
-    return [{ iterations, iterationFunc, solution: guess }, details];
+    return [
+        {
+            iterations,
+            iterationFunc,
+            spectralRadius,
+            solution: guess,
+        },
+        details,
+    ];
 };
