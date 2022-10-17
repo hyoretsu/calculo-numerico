@@ -35,6 +35,15 @@ type GaussMethod = (data: {
     details: Array<Details>,
 ];
 
+export const spectralRadius = (coefficients: number[][]): number => {
+    return Math.max(
+        ...coefficients.map(
+            (number, i) =>
+                number.reduce((prev, curr) => prev + Math.abs(curr), 0) / Math.abs(number[i]),
+        ),
+    );
+};
+
 export const gaussJacobi: GaussMethod = ({
     coefficients,
     independentTerms,
@@ -43,16 +52,6 @@ export const gaussJacobi: GaussMethod = ({
 }) => {
     const details = [];
     let iterations = 0;
-
-    const spectralRadius = Math.max(
-        ...coefficients.map(
-            (number, i) =>
-                number.reduce((prev, curr) => prev + Math.abs(curr), 0) / Math.abs(number[i]),
-        ),
-    );
-    if (spectralRadius >= 1) {
-        throw new Error('Convergence is only guaranteed for p(A) < 1.');
-    }
 
     const dimension = independentTerms.length;
     const iterationFunc = independentTerms.map((number, i) => {
@@ -106,7 +105,7 @@ export const gaussJacobi: GaussMethod = ({
         {
             iterations,
             iterationFunc,
-            spectralRadius,
+            spectralRadius: spectralRadius(coefficients),
             solution: guess,
         },
         details,
@@ -121,16 +120,6 @@ export const gaussSeidel: GaussMethod = ({
 }) => {
     const details = [];
     let iterations = 0;
-
-    const spectralRadius = Math.max(
-        ...coefficients.map(
-            (number, i) =>
-                number.reduce((prev, curr) => prev + Math.abs(curr), 0) / Math.abs(number[i]),
-        ),
-    );
-    if (spectralRadius >= 1) {
-        throw new Error('Convergence is only guaranteed for p(A) < 1.');
-    }
 
     const dimension = independentTerms.length;
     const iterationFunc = independentTerms.map((number, i) => {
@@ -185,7 +174,7 @@ export const gaussSeidel: GaussMethod = ({
         {
             iterations,
             iterationFunc,
-            spectralRadius,
+            spectralRadius: spectralRadius(coefficients),
             solution: guess,
         },
         details,
