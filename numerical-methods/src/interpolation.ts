@@ -63,3 +63,51 @@ export const vandermondeInterpolation: InterpolationMethod = ({ x, y, targetX })
         }),
     };
 };
+
+type NewtonInterpolation = (data: Data) => Results & {
+    dividedDifferences: number[][];
+};
+
+// a0 + a1 * (x-x0) + a2 * (x-x0) * (x-x1) + ...
+export const newtonInterpolation: NewtonInterpolation = ({ x, y, targetX }) => {
+    const dividedDifferences: number[][] = [];
+
+    x.forEach((_, i) => {
+        if (i === 0) {
+            dividedDifferences.push(y);
+            return;
+        }
+
+        const column = [];
+        for (let j = 0; j < x.length - i; j++) {
+            column.push(
+                (dividedDifferences[i - 1][j + 1] - dividedDifferences[i - 1][j]) /
+                    (x[i + j] - x[j]),
+            );
+        }
+        dividedDifferences.push(column);
+    });
+
+    const polynomial = dividedDifferences
+        .map((difference, i) => {
+            if (i === 0) return String(difference[0]);
+
+            let literal = '';
+            for (let j = 0; j < i; j++) {
+                literal += `(x ${Math.sign(x[j]) === 1 ? '-' : '+'} ${Math.abs(x[j])})`;
+            }
+
+            return `${Math.sign(difference[0]) === 1 ? '+' : '-'} ${Math.abs(
+                difference[0],
+            )} * ${literal}`;
+        })
+        .join(' ');
+
+    return {
+        polynomial,
+        dividedDifferences,
+        ...(targetX && {
+            result: evaluate(polynomial, { x: targetX }),
+        }),
+    };
+};
