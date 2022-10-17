@@ -25,7 +25,7 @@ export const lagrangeInterpolation: InterpolationMethod = ({ x, y, targetX }) =>
             x.forEach((_, j) => {
                 if (j === i) return;
 
-                numerator += `(x - ${x[j]})`;
+                numerator += `(x ${Math.sign(x[j]) === 1 ? '-' : '+'} ${Math.abs(x[j])})`;
                 denominator *= x[i] - x[j];
             });
 
@@ -53,7 +53,7 @@ export const vandermondeInterpolation: InterpolationMethod = ({ x, y, targetX })
     const polynomial = vandermondeResults.reduce((prev, curr, i) => {
         if (i === 0) return String(fixNumber(curr));
 
-        return `${prev} + ${fixNumber(curr)} * x^${i}`;
+        return `${prev} ${Math.sign(curr) === 1 ? '+' : '-'} ${Math.abs(fixNumber(curr))} * x^${i}`;
     }, '');
 
     return {
