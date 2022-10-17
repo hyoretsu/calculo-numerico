@@ -20,7 +20,7 @@ export const lagrangeInterpolation: LagrangeInterpolation = ({ x, y, targetX }) 
                 denominator *= x[i] - x[j];
             });
 
-            return `${result} * (${numerator})/${Number(denominator.toPrecision(15))}`;
+            return `${result} * (${numerator})/${fixNumber(denominator)}`;
         })
         .reduce((prev, curr) => (prev ? `${prev} + ${curr}` : curr), '');
 
