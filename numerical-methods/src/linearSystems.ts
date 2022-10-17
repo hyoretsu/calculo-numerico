@@ -88,7 +88,7 @@ export const gaussJacobi: GaussMethod = ({
             relativeError: fixNumber(relativeError),
         });
 
-        if (absoluteError < precision || iterations >= maxIterations) break;
+        if (relativeError < precision || iterations >= maxIterations) break;
     }
 
     return [{ iterations, iterationFunc, solution: guess }, details];
@@ -149,7 +149,7 @@ export const gaussSeidel: GaussMethod = ({
             relativeError: fixNumber(relativeError),
         });
 
-        if ((iterations > 0 && absoluteError < precision) || iterations >= maxIterations) break;
+        if ((iterations > 0 && relativeError < precision) || iterations >= maxIterations) break;
     }
 
     return [{ iterations, iterationFunc, solution: guess }, details];
