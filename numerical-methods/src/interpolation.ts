@@ -1,13 +1,22 @@
 import { evaluate } from 'mathjs';
 
-import { fixNumber } from './utils';
+import { gaussSeidel } from './linearSystems';
+import { fixNumber, range } from './utils';
 
-type LagrangeInterpolation = (data: { x: number[]; y: number[]; targetX?: number }) => {
+interface Data {
+    x: number[];
+    y: number[];
+    targetX?: number;
+}
+
+interface Results {
     polynomial: string;
     result?: number;
-};
+}
 
-export const lagrangeInterpolation: LagrangeInterpolation = ({ x, y, targetX }) => {
+type InterpolationMethod = (data: Data) => Results;
+
+export const lagrangeInterpolation: InterpolationMethod = ({ x, y, targetX }) => {
     const polynomial = y
         .map((result, i) => {
             let numerator = '';
@@ -23,6 +32,29 @@ export const lagrangeInterpolation: LagrangeInterpolation = ({ x, y, targetX }) 
             return `${result} * (${numerator})/${fixNumber(denominator)}`;
         })
         .reduce((prev, curr) => (prev ? `${prev} + ${curr}` : curr), '');
+
+    return {
+        polynomial,
+        ...(targetX && {
+            result: fixNumber(evaluate(polynomial, { x: targetX })),
+        }),
+    };
+};
+
+export const vandermondeInterpolation: InterpolationMethod = ({ x, y, targetX }) => {
+    const dimension = x.length;
+
+    const [{ solution: vandermondeResults }] = gaussSeidel({
+        coefficients: x.map((coefficient, i) => range(dimension).map(j => coefficient ** j)),
+        independentTerms: y,
+        precision: 1e-9,
+    });
+
+    const polynomial = vandermondeResults.reduce((prev, curr, i) => {
+        if (i === 0) return String(fixNumber(curr));
+
+        return `${prev} + ${fixNumber(curr)} * x^${i}`;
+    }, '');
 
     return {
         polynomial,
