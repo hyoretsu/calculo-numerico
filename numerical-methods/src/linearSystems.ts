@@ -5,7 +5,7 @@
 
 import { evaluate } from 'mathjs';
 
-import { fixNumber, range } from './utils';
+import { fixNumber, range, swap } from './utils';
 
 interface Details {
     iteration: number;
@@ -15,17 +15,22 @@ interface Details {
     relativeError: number;
 }
 
+interface Matrix {
+    coefficients: number[][];
+    independentTerms: number[];
+}
+
 interface Options {
     /** Maximum number of iterations. */
     maxIterations?: number;
 }
 
-type GaussMethod = (data: {
-    coefficients: number[][];
-    independentTerms: number[];
-    precision: number;
-    options?: Options;
-}) => [
+type GaussMethod = (
+    data: Matrix & {
+        precision: number;
+        options?: Options;
+    },
+) => [
     results: {
         iterations: number;
         iterationFunc: string[];
@@ -34,6 +39,73 @@ type GaussMethod = (data: {
     },
     details: Array<Details>,
 ];
+
+export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) => {
+    const transformedFuncs = [];
+    const results = {};
+
+    for (let j = 0; j < coefficients.length; j++) {
+        let highestLine = j;
+
+        // Find the correct pivot's line
+        for (let i = j; i < coefficients.length; i++) {
+            if (i === j) continue;
+
+            if (coefficients[i][j] > coefficients[highestLine][j]) {
+                highestLine = i;
+            }
+        }
+
+        coefficients = swap(coefficients, j, highestLine);
+        independentTerms = swap(independentTerms, j, highestLine);
+
+        const multipliers = [];
+
+        // Find multipliers for each line
+        for (let i = j + 1; i < coefficients.length; i++) {
+            multipliers[i] = coefficients[i][j] / coefficients[j][j];
+        }
+
+        // Transform next lines with multipliers
+        for (let i = j + 1; i < coefficients.length; i++) {
+            for (let k = j; k < coefficients.length; k++) {
+                coefficients[i][k] -= multipliers[i] * coefficients[j][k];
+            }
+
+            independentTerms[i] -= multipliers[i] * independentTerms[j];
+        }
+    }
+
+    // Solve the system
+    for (let i = coefficients.length - 1; i >= 0; i--) {
+        let equation = '';
+
+        for (let j = 0; j < coefficients.length; j++) {
+            if (coefficients[i][j] === 0) continue;
+
+            if (equation === '') {
+                equation = `${String.fromCharCode('a'.charCodeAt(0) + j)} = () / ${
+                    coefficients[i][j]
+                }`;
+                continue;
+            }
+
+            equation = equation.replace(
+                /\((.*)\)/,
+                `($1-${coefficients[i][j]}${String.fromCharCode('a'.charCodeAt(0) + j)} + )`,
+            );
+        }
+        equation = equation.replace(/\((.*)\)/, `($1${independentTerms[i]})`);
+        transformedFuncs.push(equation);
+
+        evaluate(equation, results);
+    }
+
+    return {
+        transformedFuncs,
+        results,
+    };
+};
 
 export const spectralRadius = (coefficients: number[][]): number => {
     return Math.max(

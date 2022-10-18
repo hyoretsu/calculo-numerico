@@ -33,3 +33,14 @@ export const range = (start: number, stop = 0, step = 1): number[] => {
 
     return Array.from({ length }, (_, index) => start + step * index);
 };
+
+/**
+ * Swaps the elements of an array at the two given indexes.
+ */
+export const swap = (array: any[], firstIndex: number, secondIndex: number): any[] => {
+    const temp = array[firstIndex];
+    array[firstIndex] = array[secondIndex];
+    array[secondIndex] = temp;
+
+    return array;
+};
