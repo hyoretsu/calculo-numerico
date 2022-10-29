@@ -10,6 +10,7 @@ interface Matrix {
 export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) => {
     const transformedFuncs = [];
     const results = {};
+    const steps = [];
 
     for (let j = 0; j < coefficients.length; j++) {
         let highestLine = j;
@@ -25,6 +26,12 @@ export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) 
 
         coefficients = swap(coefficients, j, highestLine);
         independentTerms = swap(independentTerms, j, highestLine);
+        steps.push(
+            coefficients.map((line, i) => [
+                ...line.map(number => number.toFixed(2)),
+                independentTerms[i].toFixed(2),
+            ]),
+        );
 
         const multipliers = [];
 
@@ -71,6 +78,7 @@ export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) 
     return {
         transformedFuncs,
         results,
+        steps,
     };
 };
 
