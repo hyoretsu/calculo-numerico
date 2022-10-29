@@ -22,7 +22,7 @@ export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) 
         for (let i = j; i < coefficients.length; i++) {
             if (i === j) continue;
 
-            if (coefficients[i][j] > coefficients[highestLine][j]) {
+            if (coefficientsL[i][j] > coefficientsL[highestLine][j]) {
                 highestLine = i;
             }
         }
