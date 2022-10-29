@@ -8,6 +8,9 @@ interface Matrix {
 }
 
 export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) => {
+    const coefficientsL = [...coefficients];
+    const independentTermsL = [...independentTerms];
+
     const transformedFuncs = [];
     const results = {};
     const steps = [];
@@ -24,12 +27,12 @@ export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) 
             }
         }
 
-        coefficients = swap(coefficients, j, highestLine);
-        independentTerms = swap(independentTerms, j, highestLine);
+        swap(coefficientsL, j, highestLine);
+        swap(independentTermsL, j, highestLine);
         steps.push(
-            coefficients.map((line, i) => [
+            coefficientsL.map((line, i) => [
                 ...line.map(number => number.toFixed(2)),
-                independentTerms[i].toFixed(2),
+                independentTermsL[i].toFixed(2),
             ]),
         );
 
@@ -37,16 +40,16 @@ export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) 
 
         // Find multipliers for each line
         for (let i = j + 1; i < coefficients.length; i++) {
-            multipliers[i] = coefficients[i][j] / coefficients[j][j];
+            multipliers[i] = coefficientsL[i][j] / coefficientsL[j][j];
         }
 
         // Transform next lines with multipliers
         for (let i = j + 1; i < coefficients.length; i++) {
             for (let k = j; k < coefficients.length; k++) {
-                coefficients[i][k] -= multipliers[i] * coefficients[j][k];
+                coefficientsL[i][k] -= multipliers[i] * coefficientsL[j][k];
             }
 
-            independentTerms[i] -= multipliers[i] * independentTerms[j];
+            independentTermsL[i] -= multipliers[i] * independentTermsL[j];
         }
     }
 
@@ -55,21 +58,21 @@ export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) 
         let equation = '';
 
         for (let j = 0; j < coefficients.length; j++) {
-            if (coefficients[i][j] === 0) continue;
+            if (coefficientsL[i][j] === 0) continue;
 
             if (equation === '') {
                 equation = `${String.fromCharCode('a'.charCodeAt(0) + j)} = () / ${
-                    coefficients[i][j]
+                    coefficientsL[i][j]
                 }`;
                 continue;
             }
 
             equation = equation.replace(
                 /\((.*)\)/,
-                `($1-${coefficients[i][j]}${String.fromCharCode('a'.charCodeAt(0) + j)} + )`,
+                `($1-${coefficientsL[i][j]}${String.fromCharCode('a'.charCodeAt(0) + j)} + )`,
             );
         }
-        equation = equation.replace(/\((.*)\)/, `($1${independentTerms[i]})`);
+        equation = equation.replace(/\((.*)\)/, `($1${independentTermsL[i]})`);
         transformedFuncs.push(equation);
 
         evaluate(equation, results);
@@ -121,24 +124,27 @@ export const gaussJacobi: GaussMethod = ({
     precision,
     options: { maxIterations = Infinity } = {},
 }) => {
+    const coefficientsL = [...coefficients];
+    const independentTermsL = [...independentTerms];
+
     const details = [];
     let iterations = 0;
 
     const dimension = independentTerms.length;
     // Creating iteration functions
-    const iterationFunc = independentTerms.map((number, i) => {
+    const iterationFunc = independentTermsL.map((number, i) => {
         return [
             ...range(dimension - 1).map(j => {
                 const correctJ = j >= i ? j + 1 : j;
 
-                return `${-coefficients[i][correctJ] / coefficients[i][i]} * ${String.fromCharCode(
-                    'a'.charCodeAt(0) + correctJ,
-                )} + `;
+                return `${
+                    -coefficientsL[i][correctJ] / coefficientsL[i][i]
+                } * ${String.fromCharCode('a'.charCodeAt(0) + correctJ)} + `;
             }),
-            String(number / coefficients[i][i]),
+            String(number / coefficientsL[i][i]),
         ].join('');
     });
-    let guess = independentTerms.map((number, i) => number / coefficients[i][i]);
+    let guess = independentTermsL.map((number, i) => number / coefficientsL[i][i]);
 
     while (true) {
         const prevGuess = guess;
@@ -192,24 +198,27 @@ export const gaussSeidel: GaussMethod = ({
     precision,
     options: { maxIterations = Infinity } = {},
 }) => {
+    const coefficientsL = [...coefficients];
+    const independentTermsL = [...independentTerms];
+
     const details = [];
     let iterations = 0;
 
     const dimension = independentTerms.length;
     // Creating iteration functions
-    const iterationFunc = independentTerms.map((number, i) => {
+    const iterationFunc = independentTermsL.map((number, i) => {
         return [
             ...range(dimension - 1).map(j => {
                 const correctJ = j >= i ? j + 1 : j;
 
-                return `${-coefficients[i][correctJ] / coefficients[i][i]} * ${String.fromCharCode(
-                    'a'.charCodeAt(0) + correctJ,
-                )} + `;
+                return `${
+                    -coefficientsL[i][correctJ] / coefficientsL[i][i]
+                } * ${String.fromCharCode('a'.charCodeAt(0) + correctJ)} + `;
             }),
-            String(number / coefficients[i][i]),
+            String(number / coefficientsL[i][i]),
         ].join('');
     });
-    const guess = independentTerms.map(_ => 0);
+    const guess = independentTermsL.map(_ => 0);
 
     while (true) {
         const prevGuess = [...guess];
