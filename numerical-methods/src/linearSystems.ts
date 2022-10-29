@@ -1,44 +1,11 @@
-// Calcula determinante, tem q ser diferente de 0
-// Parada 1: maior diferença absoluta entre os X menor que precisão
-// a
-// Chute inicial é termo independente dividido pelo coeficiente do X
-
 import { evaluate } from 'mathjs';
 
 import { fixNumber, range, swap } from './utils';
-
-interface Details {
-    iteration: number;
-    currentGuess: number[];
-    nextGuess: number[];
-    absoluteError: number;
-    relativeError: number;
-}
 
 interface Matrix {
     coefficients: number[][];
     independentTerms: number[];
 }
-
-interface Options {
-    /** Maximum number of iterations. */
-    maxIterations?: number;
-}
-
-type GaussMethod = (
-    data: Matrix & {
-        precision: number;
-        options?: Options;
-    },
-) => [
-    results: {
-        iterations: number;
-        iterationFunc: string[];
-        spectralRadius: number;
-        solution: number[];
-    },
-    details: Array<Details>,
-];
 
 export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) => {
     const transformedFuncs = [];
@@ -107,6 +74,30 @@ export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) 
     };
 };
 
+type GaussMethod = (
+    data: Matrix & {
+        precision: number;
+        options?: {
+            /** Maximum number of iterations. */
+            maxIterations?: number;
+        };
+    },
+) => [
+    results: {
+        iterations: number;
+        iterationFunc: string[];
+        spectralRadius: number;
+        solution: number[];
+    },
+    details: Array<{
+        iteration: number;
+        currentGuess: number[];
+        nextGuess: number[];
+        absoluteError: number;
+        relativeError: number;
+    }>,
+];
+
 export const spectralRadius = (coefficients: number[][]): number => {
     return Math.max(
         ...coefficients.map(
@@ -126,6 +117,7 @@ export const gaussJacobi: GaussMethod = ({
     let iterations = 0;
 
     const dimension = independentTerms.length;
+    // Creating iteration functions
     const iterationFunc = independentTerms.map((number, i) => {
         return [
             ...range(dimension - 1).map(j => {
@@ -143,9 +135,11 @@ export const gaussJacobi: GaussMethod = ({
     while (true) {
         const prevGuess = guess;
 
+        // Applying guesses to the iteration functions
         guess = iterationFunc.map((func, i) =>
             evaluate(
                 func,
+                // Merging all guesses in a single object
                 guess.reduce((prev, curr) => {
                     return {
                         ...prev,
@@ -194,6 +188,7 @@ export const gaussSeidel: GaussMethod = ({
     let iterations = 0;
 
     const dimension = independentTerms.length;
+    // Creating iteration functions
     const iterationFunc = independentTerms.map((number, i) => {
         return [
             ...range(dimension - 1).map(j => {
@@ -211,9 +206,11 @@ export const gaussSeidel: GaussMethod = ({
     while (true) {
         const prevGuess = [...guess];
 
+        // Applying each guess to the next iteration function
         iterationFunc.forEach((func, i) => {
             guess[i] = evaluate(
                 func,
+                // Merging all guesses in a single object
                 guess.reduce(
                     (prev, curr) => ({
                         ...prev,

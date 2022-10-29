@@ -68,10 +68,10 @@ type NewtonInterpolation = (data: Data) => Results & {
     dividedDifferences: number[][];
 };
 
-// a0 + a1 * (x-x0) + a2 * (x-x0) * (x-x1) + ...
 export const newtonInterpolation: NewtonInterpolation = ({ x, y, targetX }) => {
     const dividedDifferences: number[][] = [];
 
+    // Creating all of the divided differences
     x.forEach((_, i) => {
         if (i === 0) {
             dividedDifferences.push(y);
