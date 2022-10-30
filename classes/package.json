@@ -5,6 +5,7 @@
         "build": "node esbuild.js"
     },
     "dependencies": {
+        "mathjs": "^11.2.1",
         "numerical-methods": "workspace:*"
     }
 }

@@ -36,8 +36,10 @@ importers:
 
   classes:
     specifiers:
+      mathjs: ^11.2.1
       numerical-methods: workspace:*
     dependencies:
+      mathjs: 11.2.1
       numerical-methods: link:../numerical-methods
 
   numerical-methods:

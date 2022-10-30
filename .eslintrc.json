@@ -28,8 +28,9 @@
         "no-param-reassign": "off",
         "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
         "no-unused-expressions": ["off", { "allowShortCircuit": true }],
-        "no-unused-vars": ["error", { "argsIgnorePattern": "^_|next" }],
+        "no-unused-vars": ["warn", { "argsIgnorePattern": "^_|next" }],
         "one-var": ["error", { "uninitialized": "always" }],
+        "prefer-const": "warn",
         "prefer-destructuring": "warn",
         "prettier/prettier": [
             "error",
