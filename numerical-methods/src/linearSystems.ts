@@ -2,7 +2,7 @@ import { evaluate } from 'mathjs';
 
 import { fixNumber, range, swap } from './utils';
 
-interface Matrix {
+export interface Matrix {
     coefficients: number[][];
     independentTerms: number[];
 }
@@ -85,7 +85,7 @@ export const gaussianElimination = ({ coefficients, independentTerms }: Matrix) 
     };
 };
 
-type GaussMethod = (
+export type GaussMethod = (
     data: Matrix & {
         precision: number;
         options?: {

@@ -3,7 +3,7 @@ import { derivative, evaluate } from 'mathjs';
 import { newtonRaphson } from './functionZeros';
 import { isOdd, range } from './utils';
 
-type IntegrationMethod = (info: { func: string; pointN: number; x: [number, number] }) => {
+export type IntegrationMethod = (info: { func: string; pointN: number; x: [number, number] }) => {
     result: number;
     error: number;
 };

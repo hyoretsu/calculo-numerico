@@ -14,7 +14,7 @@ interface Results {
     result?: number;
 }
 
-type InterpolationMethod = (data: Data) => Results;
+export type InterpolationMethod = (data: Data) => Results;
 
 export const lagrangeInterpolation: InterpolationMethod = ({ x, y, targetX }) => {
     const polynomial = y

@@ -24,7 +24,7 @@ interface Options {
     relativeError?: number | boolean;
 }
 
-type SimpleZerosFunction = (info: {
+export type SimpleZerosFunction = (info: {
     func: string;
     interval: number[];
     precision: number;
@@ -209,7 +209,7 @@ export const falsePosition: SimpleZerosFunction = ({
     ];
 };
 
-type NewtonRaphson = (params: {
+export type NewtonRaphson = (params: {
     func: string;
     initialX: number;
     precision: number;
@@ -294,7 +294,7 @@ export const newtonRaphson: NewtonRaphson = ({
     ];
 };
 
-type Secant = (params: {
+export type Secant = (params: {
     func: string;
     interval: number[];
     precision: number;
