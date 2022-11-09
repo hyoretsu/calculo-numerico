@@ -109,7 +109,7 @@ export const simpsonRule13: IntegrationMethod = ({ func, pointN, x }) => {
             const maxPoint = findMaximumPoint(fourthDerivative, 1);
 
             error =
-                (amplitude ** 5 / (12 * intervals ** 2)) *
+                (amplitude ** 5 / (180 * intervals ** 2)) *
                 Math.abs(evaluate(fourthDerivative, { x: maxPoint }));
 
             break;

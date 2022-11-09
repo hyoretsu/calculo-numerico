@@ -1,4 +1,4 @@
 export * from './functionZeros';
-export * from './integral';
+export * from './integration';
 export * from './interpolation';
 export * from './linearSystems';
