@@ -1,37 +1,11 @@
 import { derivative, evaluate } from 'mathjs';
 
-import { newtonRaphson } from './functionZeros';
+import { minMaxBisection } from './custom';
 import { isOdd, range } from './utils';
 
 export type IntegrationMethod = (info: { func: string; pointN: number; x: [number, number] }) => {
     result: number;
     error: number;
-};
-
-const findMaximumPoint = (func: string, initialGuess: number) => {
-    let currentGuess = initialGuess;
-
-    while (true) {
-        const [{ x: point }] = newtonRaphson({
-            func: derivative(func, 'x').toString(),
-            initialX: currentGuess,
-            precision: 1e-12,
-        });
-        const numberPoint = Number(point);
-
-        const midResult = evaluate(func, { x: numberPoint });
-        const leftResult = evaluate(func, { x: numberPoint - 0.01 });
-        const rightResult = evaluate(func, { x: numberPoint + 0.01 });
-
-        if (leftResult < midResult && rightResult < midResult) {
-            currentGuess = numberPoint;
-            break;
-        }
-
-        currentGuess = numberPoint + 5;
-    }
-
-    return currentGuess;
 };
 
 export const trapezoidalRule: IntegrationMethod = ({ func, pointN, x }) => {
@@ -50,27 +24,22 @@ export const trapezoidalRule: IntegrationMethod = ({ func, pointN, x }) => {
     }, 0);
     result *= amplitude / 2;
 
-    let error = 0;
-    switch (func) {
-        // Maximum point's at the highest X in the interval
-        case 'e^x':
-            error =
-                (amplitude ** 3 / (12 * intervals ** 2)) * Math.abs(evaluate(func, { x: x[1] }));
+    const secondDerivative = derivative(derivative(func, 'x'), 'x').toString();
 
-            break;
-        // Find maximum point of second derivative for error calculation
-        default: {
-            const secondDerivative = derivative(derivative(func, 'x'), 'x').toString();
+    const [
+        {
+            interval: [maxPoint],
+        },
+    ] = minMaxBisection({
+        func: secondDerivative,
+        interval: [x[0], x[1]],
+        target: 'max',
+        precision: 1e-12,
+    });
 
-            const maxPoint = findMaximumPoint(secondDerivative.toString(), 1);
-
-            error =
-                (amplitude ** 3 / (12 * intervals ** 2)) *
-                Math.abs(evaluate(secondDerivative, { x: maxPoint }));
-
-            break;
-        }
-    }
+    const error =
+        (amplitude ** 3 / (12 * intervals ** 2)) *
+        Math.abs(evaluate(secondDerivative, { x: maxPoint }));
 
     return { result, error };
 };
@@ -91,30 +60,25 @@ export const simpsonRule13: IntegrationMethod = ({ func, pointN, x }) => {
     }, 0);
     result *= amplitude / 3;
 
-    let error = 0;
-    switch (func) {
-        // Maximum point's at the highest X in the interval
-        case 'e^x':
-            error =
-                (amplitude ** 3 / (12 * intervals ** 2)) * Math.abs(evaluate(func, { x: x[1] }));
+    const fourthDerivative = derivative(
+        derivative(derivative(derivative(func, 'x'), 'x'), 'x'),
+        'x',
+    ).toString();
 
-            break;
-        // Find maximum point of fourth derivative for error calculation
-        default: {
-            const fourthDerivative = derivative(
-                derivative(derivative(derivative(func, 'x'), 'x'), 'x'),
-                'x',
-            ).toString();
+    const [
+        {
+            interval: [maxPoint],
+        },
+    ] = minMaxBisection({
+        func: fourthDerivative,
+        interval: [x[0], x[1]],
+        target: 'max',
+        precision: 1e-12,
+    });
 
-            const maxPoint = findMaximumPoint(fourthDerivative, 1);
-
-            error =
-                (amplitude ** 5 / (180 * intervals ** 2)) *
-                Math.abs(evaluate(fourthDerivative, { x: maxPoint }));
-
-            break;
-        }
-    }
+    const error =
+        (amplitude ** 5 / (180 * intervals ** 2)) *
+        Math.abs(evaluate(fourthDerivative, { x: maxPoint }));
 
     return { result, error };
 };

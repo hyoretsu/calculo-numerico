@@ -2,40 +2,42 @@ import { derivative, evaluate } from 'mathjs';
 
 import { fixNumber } from './utils';
 
-interface Details {
-    iteration: number;
-    x: number;
-    y?: number;
-    relativeError?: number;
-    condition1: number;
-    condition2: number;
-}
+export namespace FunctionZeros {
+    export interface Details {
+        iteration: number;
+        x: number;
+        y?: number;
+        relativeError?: number;
+        condition1: number;
+        condition2: number;
+    }
 
-interface Options {
-    /** Stop iterating as soon as any of the conditions are true. */
-    bail?: boolean;
-    /** Which conditions you want to consider when iterating. */
-    conditionsWhitelist?: boolean[];
-    /** Maximum number of iterations. */
-    maxIterations?: number;
-    /** For instances where you're iterating over a different function, but still want the results from the original one e.g. iterating over a differentiated function to find a maximum value from the original. */
-    origFunc?: string;
-    /** Outputs the relative error between the new X and the last X or the true X, if given. */
-    relativeError?: number | boolean;
+    export interface Options {
+        /** Stop iterating as soon as any of the conditions are true. */
+        bail?: boolean;
+        /** Which conditions you want to consider when iterating. */
+        conditionsWhitelist?: boolean[];
+        /** Maximum number of iterations. */
+        maxIterations?: number;
+        /** For instances where you're iterating over a different function, but still want the results from the original one e.g. iterating over a differentiated function to find a maximum value from the original. */
+        origFunc?: string;
+        /** Outputs the relative error between the new X and the last X or the true X, if given. */
+        relativeError?: number | boolean;
+    }
 }
 
 export type SimpleZerosFunction = (info: {
     func: string;
     interval: number[];
     precision: number;
-    options?: Options;
+    options?: FunctionZeros.Options;
 }) => [
     results: {
         iterations: number;
         interval: [string, string];
     },
     details: Array<
-        Details & {
+        FunctionZeros.Details & {
             interval: number[];
             results: number[];
         }
@@ -213,14 +215,14 @@ export type NewtonRaphson = (params: {
     func: string;
     initialX: number;
     precision: number;
-    options?: Options;
+    options?: FunctionZeros.Options;
 }) => [
     results: {
         iterations: number;
         x: string;
     },
     details: Array<
-        Details & {
+        FunctionZeros.Details & {
             prevX: number;
             prevY: number;
             diffY: number;
@@ -298,14 +300,14 @@ export type Secant = (params: {
     func: string;
     interval: number[];
     precision: number;
-    options?: Options;
+    options?: FunctionZeros.Options;
 }) => [
     results: {
         iterations: number;
         interval: [string, string];
     },
     details: Array<
-        Details & {
+        FunctionZeros.Details & {
             interval: number[];
             results: number[];
         }
