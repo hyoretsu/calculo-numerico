@@ -5,6 +5,14 @@ export const fixNumber = (number: number): number => {
     return Number(number.toPrecision(12));
 };
 
+export const isEven = (number: number): boolean => {
+    return number % 2 === 0;
+};
+
+export const isOdd = (number: number): boolean => {
+    return number % 2 === 1;
+};
+
 /**
  * @param	start - A number specifying at which position to start. Default is 0.
  * When called alone, it acts like `range(stop)`
